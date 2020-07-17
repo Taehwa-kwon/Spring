@@ -1,0 +1,11 @@
+처음에 dispatcher-servlet이 실행되고 -> UserController 가 실행되고 다시 / < 이걸로 매핑했으니 -> home.jsp로 가는데 -> 새글쓰기 누르면 -> UserController 왔다가 ->  write.jsp로 갔다가 -> 입력받아서 submit하면 해당 form의 action이 Write니깐
+-> UserController에서 다시 @RequestMapping("/Write")로  name값들이 보내지고 -> 다시 @Autowired가 실행이 되서   UserDao userDao 가 실행이 되며 ref= dataSource가 위에 DB연결 id 정보들을 가지고 와서 다시-> property의 name이 dataSource고 (얘는 최종적으로 UserDaoImplement.java 의 setDataSource(DataSource dataSource)뒤에 dataSource에 들어온다)
+-> class가 말하는곳에 해당 bean을 사용가능하게 만든다. 다시 그 친구의 이름은 userDao고  그럼 bean의 id=  << 이게 생성자나 세터등을 사용하여 의존성 주입을 한다. 해당 빈을 찾아서 주입해주는 annotation.
+-> 그 다음 UserDaoImplement.java 가 실행이 되고 ->   setDataSource 이 실행되고 그것이 끝나면 -> 돌아와서 write(UserVo vo,Model model) 매개변수들이 UserVo가  그 값들을 받고   -> 그 전에 write(UserVo vo)가 그 값을 받을수 있는 이유는 Autowired가 생성자나 세터 등을 사용하여 의존성 주입을 하려고 할 때, 해당 빈을 찾아서 주입해주는 annotation이다.
+-> UserVo.java파일의 필드값들과 반드시 write.jsp의 input 타입들의 name명 이랑 반드시 같아야한다.-> 다시 userDao.addUser(vo)가 실행되고  -> UserDao.java로 이동하고  그걸 구현하고 있는게 UserDaoImplement.java가 인터페이스를 구현하고 있으니깐
+-> DataSource가 DB의 대한 정보를 담고있고 -> addUser가 실행되구 메소드 실행 -> return 이 list 인데 ---> 어딜가던지 dispatcher-servlet를 들겼다가 간다
+
+ 
+ 
+ 
+ 
