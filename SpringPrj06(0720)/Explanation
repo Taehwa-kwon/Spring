@@ -1,0 +1,15 @@
+pom.xml에 
+
+<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-aspects</artifactId>
+			<version>${org.springframework-version}</version>
+		</dependency>
+		
+추가 해주고
+Logger 만들고
+
+animal.xml을 추가해준다.  
+
+aop:pointcut에서  com.pknu.aop.*.sound() 찾아서 걔네들의 이름을 selectSound라는 이름을 준다. 
+근데 aop:before이 있으니깐 sound()함수가 실행되기 전에 aboutToSound를 먼저 실행해라.

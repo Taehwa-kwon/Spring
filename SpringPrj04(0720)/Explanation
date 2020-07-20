@@ -1,0 +1,17 @@
+설명!  
+Autowired가 있다면 bean객체안에서 Constructor-arg 혹은 property가 필요없다. 이유는 자동으로 의존대상객체를 검색한다.
+<context:annotation-config> 가 있어야 annotation을 사용가능하다.
+
+Autowired 는 아래의 메소드의 클래스명을 기준으로 xml에서 class를 자동으로 찾아서 바인딩한다.
+근데 만약에 xml에서 class가 서로 같으면 문제가 발생하지 그래서 bean의 id는 서로 다르게 두고 Qualifier("dog"), Qualifier("cat") 이렇게 가능.
+
+실행순서 
+제일먼저 main이 실행되고 첫줄이 쭉 실행된다. classPath가 실행이 되겠지 -> 그 다음 animal.xml을 읽고 context:annotation-config를 읽고 -> autowired가 실행이 된다. -> 그럼 Qualifier에 value가 dog인것을 실행하고
+-> bean객체에서 value가 dog인것을 찾고  property name=name이 실행되는데 해당 class="com.pknu.di.Dog"에서 실행되고 property때문에 Dog.java에서 setName이 실행되고 강아지가 name에 저장된다.
+-> 다시 PetOwner.java의 두번째 줄이 실행되고 private AnimalType animal 인데 animal 변수가 Dog.java에서 name변수인 dog객체가 저장되어있다.
+궁금한게.... 어떻게 private AnimalType animal의 animal객체에 dog객체가 저장되어지지? .. 클래스에 의존주입 뭐 Autowired의 특성인것 같음 
+
+Autowired가 실행되고 Qualifier이 실행되고 value="dog" 인 것을 찾고 해당 property name="name" 이니깐  Dog클래스안에 setName을 찾는다.
+TestMain.java에서  
+ 
+ 

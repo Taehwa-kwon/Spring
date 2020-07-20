@@ -1,0 +1,24 @@
+pom.xml에 
+<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-aspects</artifactId>
+			<version>${org.springframework-version}</version>
+</dependency>
+		
+추가 해주고
+Logger 만들고
+
+animal.xml을 추가해준다.  
+
+aop:pointcut에서  com.pknu.aop.*.sound() 찾아서 걔네들의 이름을 selectSound라는 이름을 준다. 
+근데 aop:before이 있으니깐 sound()함수가 실행되기 전에 aboutToSound를 먼저 실행해라.
+
+설명 :
+1. TestMain에서 첫줄이 실행된다. 
+2. animal.xml이 쭉 실행되고 id="petOwner"의 bean이 실행되는데 constructor-arg ref="cat"이 실행되고 
+3. id="cat" 의 bean 이 실행되고 property name="name"때문에 Cat.java가 실행되고 setName 생성자가 실행되고
+4. value값인 고양이가 필드 name에 저장된다. 
+5. PetOwner.java가 실행되고 여기 생성자에는 아까 constructor-arg의 cat객체가 PetOwner.java의 animal에 저장된다. 객체가 저장됌 
+6. 그다음 TestMain에서 2번쨰 줄이 실행되는데 cat 객체를 가져와서 아래 쭉 실행 
+
+

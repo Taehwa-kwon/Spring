@@ -1,0 +1,16 @@
+설명! DI 
+
+일단 기본적으로 설명하면 AnimalType 인터페이스 1개 만들고 - Dog.java, Cat.java 를 만들고  
+TestMain.java에서 xml을 연결한다. 이유는 Dog객체와 Cat객체를 만들려면 항상 new 를 해야하는데 xml 의 bean에 미리 new 를하고 TestMain에서는 사용만 하면된다.
+Dog와 Cat 객체의 bean을 설정해주고 해당 클래스를 설정해주고    property name="name"이  Cat.java의 setName의 매개변수로 들어가서 필드에 저장해둔다. 필드를 사용하려는 곳은 인터페이스 받은 sound의 name을 사용하기 위해서.
+그 다음 bean에서 id="petOwner" 여기서 생성자ref="cat"을 class= 경로에 보내주고   <!-- property는 단순한 값을 집어넣고 constructor-arg는 객체를 집어넣는다.  -->
+그래서 PetOwner.java의 생성자에 animal에 cat객체가 들어가고 다시 필드에 private AnimalType animal 필드에 cat이 저장되고 아래에서 play()메소드는 객체. << 메소드 호출 가능하다.
+최종적으로 TestMain.java에서  person은 cat이 반환되고 실행된다.
+ 
+ -context:annotation-config는  이미 등록된 bean에 대해서만 Annotation을 활성화한다.
+ -context:component-scan 는 등록여부와 상관없이 스프링이 알아서 bean을 스캔하고 annotation을 해석하고 활성화한다.
+
+<bean id=petOwner  class="com.pknu.di.PetOwner"을 만들고 constructor-arg ref=cat을 생성자로 사용하며 class가 지정한곳에서 해당 cat을 넣어준다.
+  TestMain.java에서  PetOwner person = (PetOwner) context.getBean("petOwner"); 여기서  cat을 가져와서 생성자 다 진행하고 필드에 값 저장하고  그 다음 person.play() 메소드를 실행시켜 야옹이라는 값을 뽑아낸다.
+PetOwner의  생성자를 이용해서 cat을 생성자에 넣고 
+ 
