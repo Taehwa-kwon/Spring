@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="Board">
+	
+	<!-- myBatis도 Statement, PreparedStatement를 따라온것  -->
+	
+	<select id="BoardList" resultType="com.pknu.board.vo.BoardVo"><!-- BoardDaoImplement의 getBoardList를 가져온다. -->
+	SELECT IDX,TITLE , NAME, TO_CHAR(REGDATE, 'YYYY-MM-DD') AS REGDATE
+	FROM GUESTS 
+	ORDER BY IDX DESC
+	</select> 
+
+	
+</mapper>
