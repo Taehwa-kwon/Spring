@@ -12,6 +12,8 @@ public class TestMain {
 		System.out.println(person.toString());
 		//Dog dog = new Dog();이렇게 하거나 아니면 animal.xml에서 bean을 추가해주거나
 		
+		Dog dog = new Dog();
+		
 		person.play();
 		System.out.println(person.toString());
 		context.close();

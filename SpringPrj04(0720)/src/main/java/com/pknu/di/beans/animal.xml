@@ -17,6 +17,7 @@
 		<property name="name" value="고양이"/>
 	</bean>
 	
+	
 	<bean id="petOwner" class="com.pknu.di.PetOwner">
 	</bean>
 	

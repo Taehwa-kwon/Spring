@@ -1,7 +1,10 @@
 설명! DI 
 
 일단 기본적으로 설명하면 AnimalType 인터페이스 1개 만들고 - Dog.java, Cat.java 를 만들고  
-TestMain.java에서 xml을 연결한다. 이유는 Dog객체와 Cat객체를 만들려면 항상 new 를 해야하는데 xml 의 bean에 미리 new 를하고 TestMain에서는 사용만 하면된다.
+TestMain.java에서 xml을 연결한다. 이유는 Dog객체와 Cat객체를 만들려면 항상 new 를 해야하는데 먼저 싱글톤을 위해서 xml로 빼서 bean으로 묶어서 사용한다. 이유는 매번 new 할때마다 session이 추가되는데 메모리 낭비가 된다.
+--그래서 A 라는곳에 a,b,c,d,e,f 등등 이렇게 다 쳐다보게 만든다.--
+ xml 의 bean에 미리 new 를하고 TestMain에서는 사용만 하면된다.
+
 Dog와 Cat 객체의 bean을 설정해주고 해당 클래스를 설정해주고    property name="name"이  Cat.java의 setName의 매개변수로 들어가서 필드에 저장해둔다. 필드를 사용하려는 곳은 인터페이스 받은 sound의 name을 사용하기 위해서.
 그 다음 bean에서 id="petOwner" 여기서 생성자ref="cat"을 class= 경로에 보내주고   <!-- property는 단순한 값을 집어넣고 constructor-arg는 객체를 집어넣는다.  -->
 그래서 PetOwner.java의 생성자에 animal에 cat객체가 들어가고 다시 필드에 private AnimalType animal 필드에 cat이 저장되고 아래에서 play()메소드는 객체. << 메소드 호출 가능하다.
