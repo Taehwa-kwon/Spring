@@ -35,6 +35,19 @@ public void setTire(Tire tire) {
     this.tire = tire;
 }
 ----------------------------
+사실 setter 은 다 필요없네. getter을 사용하는곳은 view 단에서 ${} 여기서 getter vo안에 getter 을 사용ㅎ네
+
+
+----------------------------------------07/22
+view-> [web.xml-> dispatcher-servlet]-> Controller -> service -> Dao -> DB
+처음에 localhost하면 controller로 와서 return home을 받아서 다시 controller에서 -> home.jsp로 간다. -> list를 눌렀을때 
+Model는 조회한 결과를 내 보내려는 클래스. 조회는 
+항상 컨트롤러는 service를 호출한다. 무조건 , 그냥 스프링에서의 약속 , 이 서비스로 갈때 데이터 조회하려고 하니깐 조회된 결과를 arraylist를 담아서 
+service와 dao 객체는 반드시 인터페이스를 만들고 만들기로 약속.
+그 다음에 boardservice.getBoardList를 호출하고 -> 인터페이스의 getBoardList로 가고 -> 다시 그걸 구현한 implements  (여기서 각종 업무를 처리한다) -> 
+다시 getBoadList를 찾아서 가면 BoardDao에 가고 -> 그걸 구현한 DaoImplement로 이동하고   -> sqlSession은 myBatis를 호출하고 selectList는() 함수를 실행해서 저 경로에서 기다리고 있다. ->
+-> boardMapper 에서 해당 sql문을 실행한다.(dispatcher-servlet에서 bean객체 mapperLocations 의 value가 *.xml 인 이유는 한 Mapper의 namespace는 한개만 지정가능하다. 다른 연결이 필요하면 Mapper.xml을 여러개 만든다)
+
 
 
  

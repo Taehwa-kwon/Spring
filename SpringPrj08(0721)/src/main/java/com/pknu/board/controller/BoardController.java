@@ -34,5 +34,50 @@ public class BoardController {
 		
 		return "list";
 	}
+	@RequestMapping("/Board/WriteForm")
+	public String WriteForm() {
+		
+		return "write";
+	}
+	@RequestMapping("/Board/Write")
+	public String Write(BoardVo vo) {
+		boardService.addBoard(vo);
+		return "redirect:/Board/List";
+	}
+	@RequestMapping("/Board/Content")
+	public String Content(int idx,Model model) {
+		System.out.println(idx);
+		BoardVo vo=boardService.getContent(idx); //1.service호출 //11.
+		System.out.println(vo); // BoardVo에 toString 만들어놔서 찍힐듯
+		model.addAttribute("content",vo);
+		
+		
+		return "content";
+	}
+	@RequestMapping("/Board/Delete")
+	public String Delete(int idx,Model model) {
+		BoardVo vo=boardService.getDelete(idx); 
+		
+		return "redirect:/Board/List";
+	}
+	
+	@RequestMapping("/Board/UpdateForm")
+	public String UpdateForm(int idx,Model model) {
+		BoardVo vo= boardService.getContent(idx); 
+		//아니 나는 getContent는 조회니깐 그냥 조회하고 오는줄 알았는데 
+		// 조회해서 vo에 idx,title,name, regdate를 담아서 아예 가지고 와서 다시 
+		//아래 model객체를 이용해서 update라는 이름으로 vo를 전달한다.
+		model.addAttribute("update",vo);
+		
+		return "update";
+	}
+	
+	@RequestMapping("/Board/Update")
+	public String Update(BoardVo vo) {
+		System.out.println("vovovo"+vo);
+		boardService.getUpdate(vo); 
+		
+		return "redirect:/Board/List";
+	}
 	
 }

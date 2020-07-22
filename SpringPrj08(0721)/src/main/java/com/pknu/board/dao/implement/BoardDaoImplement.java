@@ -23,4 +23,36 @@ public class BoardDaoImplement implements BoardDao {
 		return list;
 	}
 
+
+	@Override
+	public BoardVo getContent(int idx) {
+		BoardVo Vo = sqlSession.selectOne("Board.BoardSelect",idx);//5.where문안에서 idx가 있어서 조회가 가능하니깐 idx를 담아서 전달한다. //7
+		return Vo;
+	}
+
+
+	@Override
+	public BoardVo getDelete(int idx) {
+		
+		return sqlSession.selectOne("Board.BoardDelete", idx);
+	}
+
+
+	@Override
+	public void getUpdate(BoardVo vo) {
+		System.out.println(vo);
+		 sqlSession.update("Board.BoardUpdate",vo);
+	}
+
+
+	@Override
+	public void addBoard(BoardVo vo) {
+		sqlSession.insert("Board.BoardWrite",vo);
+		
+	}
+
+
+
+
+
 }

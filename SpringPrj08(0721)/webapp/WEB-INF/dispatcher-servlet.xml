@@ -43,14 +43,16 @@
      </bean>
      
      <!-- SQL SessionTemplate 설정하기 DAO 인터페이스를 만들었기 때문에 mybatis에서 DAO 인터페이스를 구현하기 위해서 필요한 작업 -->
-     <bean id="sqlSessionTemplate" class="org.mybatis.spring.SqlSessionTemplate"
+     <bean id="sqlSessionTemplate" class="org.mybatis.spring.SqlSessionTemplate" 
      	destroy-method="clearCache">
   		<constructor-arg name="sqlSessionFactory" ref="sqlSessionFactory" />
 	</bean>
-     
-    <!-- 간단히 이야기 하면 DB연결에 싱글톤을 적용하기 위한것이 DBCP (database connect pool) 
+      <!-- <<여기 class의 타입을 보고 BoardDaoImplement.java에서 SqlSession sqlSession; 를 찾는다. -->
+    
+      <!-- 간단히 이야기 하면 DB연결에 싱글톤을 적용하기 위한것이 DBCP (database connect pool) bean을 사용하면 single tone이 적용된다. 
+                       이유는 bean은 여러번 new를 하는게 아니라 한번만 new 를 하는거니깐. 
+      
     	DBCP를 감싼게 DataSource 그걸 감싼게 sqlSessionFactory 다시 그걸 감싼게 sqlSessionTemplate 그걸 myBatis가 이용한다.
-    	
      -->
 
 

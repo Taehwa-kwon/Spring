@@ -22,4 +22,30 @@ public class BoardServiceImplement implements BoardService {
 		//
 	}
 
+	@Override
+	public BoardVo getContent(int idx) {
+		BoardVo vo = boardDao.getContent(idx);//3.Dao로 간다 //9.
+		return vo; 
+	}
+
+	@Override
+	public BoardVo getDelete(int idx) {
+		
+		return boardDao.getDelete(idx);
+	}
+
+	@Override
+	public void getUpdate(BoardVo vo) {
+		
+		 boardDao.getUpdate(vo);
+	}
+
+	@Override
+	public void addBoard(BoardVo vo) {
+		boardDao.addBoard(vo);
+		
+	}
+
+
+
 }

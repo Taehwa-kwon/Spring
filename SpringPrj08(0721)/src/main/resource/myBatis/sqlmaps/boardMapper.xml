@@ -4,13 +4,48 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="Board">
 	
-	<!-- myBatis도 Statement, PreparedStatement를 따라온것  -->
+	<!-- myBatis도 Statement, PreparedStatement를 따라온것 ( ? ? )    
+	myBatis는 # 이다. 
+	
+	#을 쓰면 
+	PreparedStatement ps = conn.prepareStatement(SQL문);
+	ps.setInt(1,id) 
+	-->
 	
 	<select id="BoardList" resultType="com.pknu.board.vo.BoardVo"><!-- BoardDaoImplement의 getBoardList를 가져온다. -->
-	SELECT IDX,TITLE , NAME, TO_CHAR(REGDATE, 'YYYY-MM-DD') AS REGDATE
+	SELECT IDX,TITLE , NAME, TO_CHAR(REGDATE, 'YYYY-MM-DD HH24:MI:SS DAY AM') AS REGDATE
 	FROM GUESTS 
-	ORDER BY IDX DESC
+	ORDER BY IDX ASC
 	</select> 
 
+	<!-- 6 쿼리문 시작 -->
+	<select id="BoardSelect" resultType="com.pknu.board.vo.BoardVo">
+	SELECT IDX,TITLE,NAME,TO_CHAR(REGDATE, 'YYYY-MM-DD HH24:MI:SS DAY AM') AS REGDATE
+	FROM GUESTS 
+	WHERE IDX= #{IDX}
+	</select> 
+	
+	  <!-- 간단히 이야기 하면 DB연결에 싱글톤을 적용하기 위한것이 DBCP (database connect pool) 
+    	DBCP를 감싼게 DataSource 그걸 감싼게 sqlSessionFactory 다시 그걸 감싼게 sqlSessionTemplate 그걸 myBatis가 이용한다.
+     -->
+     
+   	<delete id="BoardDelete" parameterType="com.pknu.board.vo.BoardVo">
+	Delete FROM GUESTS WHERE IDX= #{IDX}
+	</delete>  
+	 
+   	<update id="BoardUpdate" parameterType="com.pknu.board.vo.BoardVo">
+	UPDATE GUESTS SET TITLE=#{title}, NAME=#{name}, REGDATE=SYSDATE where IDX=#{IDX}
+	</update>  
+	
+	<!-- SEQIDX.NEXTVAL 이렇게 쓰면 시퀀스 사용 가능 -->
+	<insert id="BoardWrite" parameterType="com.pknu.board.vo.BoardVo">
+	INSERT INTO GUESTS (IDX, TITLE, NAME, REGDATE) 
+	VALUES ( 
+			 (SELECT NVL(MAX(IDX),0)+1 FROM GUESTS),
+			  #{title},
+			  #{name},
+			  SYSDATE
+			 )
+	</insert>
 	
 </mapper>

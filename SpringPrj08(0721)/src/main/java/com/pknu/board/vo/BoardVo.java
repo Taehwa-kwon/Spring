@@ -6,10 +6,10 @@ public class BoardVo {
 	private String name;
 	private String regdate;
 	
-	
-	public BoardVo() {};
+	public BoardVo() {}
 	
 	public BoardVo(int idx, String title, String name, String regdate) {
+		super();
 		this.idx = idx;
 		this.title = title;
 		this.name = name;
@@ -40,11 +40,11 @@ public class BoardVo {
 	public void setRegdate(String regdate) {
 		this.regdate = regdate;
 	}
-	
 	@Override
 	public String toString() {
 		return "BoardVo [idx=" + idx + ", title=" + title + ", name=" + name + ", regdate=" + regdate + "]";
 	}
+	
 	
 	
 	
