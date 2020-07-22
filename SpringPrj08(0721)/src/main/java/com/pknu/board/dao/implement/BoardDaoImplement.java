@@ -52,6 +52,20 @@ public class BoardDaoImplement implements BoardDao {
 	}
 
 
+	@Override
+	public void getContent_count(int idx) {
+		sqlSession.update("Board.BoardUpdateCount",idx);
+		
+	}
+
+
+	@Override
+	public void setIdx(int idx) {
+		sqlSession.update("Board.BoardIdxSer",idx);
+		
+	}
+
+
 
 
 

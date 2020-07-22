@@ -24,14 +24,17 @@ public class BoardServiceImplement implements BoardService {
 
 	@Override
 	public BoardVo getContent(int idx) {
+		boardDao.getContent_count(idx);
 		BoardVo vo = boardDao.getContent(idx);//3.Dao로 간다 //9.
 		return vo; 
 	}
 
 	@Override
-	public BoardVo getDelete(int idx) {
+	public void getDelete(int idx) {
 		
-		return boardDao.getDelete(idx);
+		boardDao.getDelete(idx);	//idx번 글 삭제
+		boardDao.setIdx(idx);		// 삭제번호 채우기 
+		
 	}
 
 	@Override
@@ -45,6 +48,12 @@ public class BoardServiceImplement implements BoardService {
 		boardDao.addBoard(vo);
 		
 	}
+
+//	@Override
+//	public void getContent_count(int idx) {
+//		boardDao.getContent_count(idx);
+//		
+//	}
 
 
 

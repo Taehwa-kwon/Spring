@@ -9,12 +9,14 @@ public interface BoardService {
 
 	public BoardVo getContent(int idx);//2.구현 //10.
 
-	public BoardVo getDelete(int idx);
+	public void getDelete(int idx);
 
 	public void getUpdate(BoardVo vo);
 
 	public void addBoard(BoardVo vo);
 
+	//public void getContent_count(int idx);
 
+	
 
 }

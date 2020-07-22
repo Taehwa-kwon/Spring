@@ -13,16 +13,16 @@
 	-->
 	
 	<select id="BoardList" resultType="com.pknu.board.vo.BoardVo"><!-- BoardDaoImplement의 getBoardList를 가져온다. -->
-	SELECT IDX,TITLE , NAME, TO_CHAR(REGDATE, 'YYYY-MM-DD HH24:MI:SS DAY AM') AS REGDATE
+	SELECT IDX,TITLE , NAME, TO_CHAR(REGDATE, 'YYYY-MM-DD HH24:MI:SS DAY AM') AS REGDATE,NVL(COUNT,0) AS COUNT
 	FROM GUESTS 
 	ORDER BY IDX ASC
 	</select> 
 
 	<!-- 6 쿼리문 시작 -->
 	<select id="BoardSelect" resultType="com.pknu.board.vo.BoardVo">
-	SELECT IDX,TITLE,NAME,TO_CHAR(REGDATE, 'YYYY-MM-DD HH24:MI:SS DAY AM') AS REGDATE
+	SELECT IDX,TITLE,NAME,TO_CHAR(REGDATE, 'YYYY-MM-DD HH24:MI:SS DAY AM') AS REGDATE,NVL(COUNT,0) AS COUNT
 	FROM GUESTS 
-	WHERE IDX= #{IDX}
+	WHERE IDX= #{idx}
 	</select> 
 	
 	  <!-- 간단히 이야기 하면 DB연결에 싱글톤을 적용하기 위한것이 DBCP (database connect pool) 
@@ -30,11 +30,15 @@
      -->
      
    	<delete id="BoardDelete" parameterType="com.pknu.board.vo.BoardVo">
-	Delete FROM GUESTS WHERE IDX= #{IDX}
+	Delete FROM GUESTS WHERE IDX= #{idx}
 	</delete>  
 	 
    	<update id="BoardUpdate" parameterType="com.pknu.board.vo.BoardVo">
-	UPDATE GUESTS SET TITLE=#{title}, NAME=#{name}, REGDATE=SYSDATE where IDX=#{IDX}
+	UPDATE GUESTS SET TITLE=#{title}, NAME=#{name}, REGDATE=SYSDATE  where IDX=#{idx}
+	</update>  
+   	
+   	<update id="BoardUpdateCount" parameterType="com.pknu.board.vo.BoardVo">
+	UPDATE GUESTS SET COUNT=COUNT+1 where IDX=#{idx}
 	</update>  
 	
 	<!-- SEQIDX.NEXTVAL 이렇게 쓰면 시퀀스 사용 가능 -->
@@ -47,5 +51,12 @@
 			  SYSDATE
 			 )
 	</insert>
+	
+	<!-- 만약에 5을 지웠을때 6,7,8번 뒤에 번호를 1씩 줄여준다. -->
+	<update id="BoardIdxSer" parameterType="com.pknu.board.vo.BoardVo">
+		UPDATE GUESTS
+		SET IDX = IDX-1
+		WHERE IDX > #{idx}
+	</update>
 	
 </mapper>

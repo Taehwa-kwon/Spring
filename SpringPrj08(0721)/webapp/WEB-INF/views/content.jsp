@@ -6,14 +6,15 @@
 <meta charset="UTF-8">
 <title>Insert title here</title>
 
+<link rel ="stylesheet" href ="/css/common.css"/>
+
 <style>
 	h2 {text-align:center;}
-   table, th, td{border:1px solid black; border-collapse:collapse; text-align:center;}
-   table{width:500px; margin:0 auto;}
-   td:nth-of-type(1) {width:100px;}
-   td:nth-of-type(2) {width:100px;}
-   td:nth-of-type(3) {width:100px;}
-   td:nth-of-type(4) {width:100px;}
+   td:nth-of-type(1) {width:80px;}
+   td:nth-of-type(2) {width:200px;}
+   td:nth-of-type(3) {width:80px;}
+   td:nth-of-type(4) {width:340px;}
+   td:nth-of-type(5) {width:100px;}
    .atag{text-align:center;}
    
 </style>
@@ -22,13 +23,14 @@
 </head>
 <body>
 
-<h2>목록보기</h2>
+<h2>content목록보기</h2>
 	<table>
 		<tr>
 			<th>번호</th>
 			<th>제목</th>
 			<th>이름</th>
 			<th>날짜</th>
+			<th>조회수</th>
 		</tr>
 
 			<tr>
@@ -37,6 +39,8 @@
 				<td>${content.title}</td>
 				<td>${content.name}</td>
 				<td>${content.regdate}</td>
+				<td>${content.count}</td>
+				
 			</tr>
 	</table>
 	

@@ -1,0 +1,11 @@
+@charset "UTF-8";
+
+a:hover { color:green; text-decoration:overline;}
+
+body {
+
+
+}
+
+table,th,td { border:1px solid black; border-collapse:collapse; text-align:center;}
+table{width:800px; margin:0 auto;}

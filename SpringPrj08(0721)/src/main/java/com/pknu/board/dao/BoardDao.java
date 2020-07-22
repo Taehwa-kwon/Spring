@@ -15,5 +15,9 @@ public interface BoardDao {
 
 	public void addBoard(BoardVo vo);
 
+	public void getContent_count(int idx);
+
+	public void setIdx(int idx);
+
 
 }
