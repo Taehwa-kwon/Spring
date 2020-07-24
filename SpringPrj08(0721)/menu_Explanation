@@ -1,0 +1,9 @@
+개 상근이 = new 그레이트_피레니즈();
+개 독구 = new 똥개();
+상근이->앉아();
+독구->앉아();
+
+1. MenuController.java에서 시작한다. menuList()함수가 실행되고   아래getList(map)이 실행된다. 
+2. ->DaoImplement에서  /* 여기 주의해서 보기 ! DaoImplement, 여기만 이해하면 거진 나머지는 이해안해도 괜찮음*/
+
+

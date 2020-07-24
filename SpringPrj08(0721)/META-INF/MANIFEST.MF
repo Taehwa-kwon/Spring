@@ -1,0 +1,17 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: SpringPrj08_0721_
+Bundle-SymbolicName: SpringPrj08_0721_
+Bundle-Version: 1.0.0.qualifier
+Export-Package: com.pknu.board.controller,
+ com.pknu.board.dao,
+ com.pknu.board.dao.implement,
+ com.pknu.board.service,
+ com.pknu.board.service.implement,
+ com.pknu.board.vo,
+ com.pknu.menu.controller,
+ com.pknu.menu.dao,
+ com.pknu.menu.dao.implement,
+ com.pknu.menu.service,
+ com.pknu.menu.service.implement,
+ com.pknu.menu.vo

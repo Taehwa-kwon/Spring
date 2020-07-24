@@ -10,6 +10,7 @@
 	<h1>Main</h1>
 	<a href="/Board/List">목록보기</a><br>
 	<a href="/Board/WriteForm">새글쓰기</a><br>
+	<a href="/Menus/List">메뉴관리</a><br>
 </body>
 </html>
 

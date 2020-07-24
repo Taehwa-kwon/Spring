@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="Menu">
+	
+	<!-- myBatis도 Statement, PreparedStatement를 따라온것 ( ? ? )    
+	myBatis는 # 이다. 
+	
+	#을 쓰면 
+	PreparedStatement ps = conn.prepareStatement(SQL문);
+	ps.setInt(1,id) 
+	-->
+	
+	<!--O_CURSOR할떄 사용하는게 이거고 result property 3개의 결과를 PROC_MENU_LIST에서 출력받는다 map을 사용할때는 아래와 같이 추가해야한다. -->
+	<resultMap id="menuMap123" type="com.pknu.menu.vo.MenuVo">
+		<result property="menu_id" column="MENU_ID" javaType="string"/>
+		<result property="menu_name" column="MENU_NAME" javaType="string"/>
+		<result property="menu_seq" column="MENU_SEQ" javaType="int"/>
+	</resultMap>
+	
+	
+	<select id="MenuList" statementType="CALLABLE" parameterType="hashmap" resultType="com.pknu.menu.vo.MenuVo">
+	<!-- BoardDaoImplement의 getBoardList를 가져온다. -->
+	<!-- resultMap=menu123 ,-->
+	{CALL PKG_MBOARD.PROC_MENU_LIST(
+		#{result, mode=OUT, jdbcType=CURSOR, javaType=ResultSet, resultMap= menuMap123 }
+	
+	)}
+	<!-- preparestatement , callablestatement  -->
+	
+	</select> 
+
+	<!-- jdbcType = DATE, VARCAHR, NUMERIC  -->
+	<!-- 맨앞에 menu_name은 프로시저로 값을 쏴주고 프로시저에서는 IN_MENU_NAME이 받는다. -->
+	<insert id="MenuInsert" parameterType="hashmap">
+		{CALL PKG_MBOARD.PROC_MENU_INSERT(
+		 #{menu_name, mode=IN, jdbcType=VARCHAR }
+		)}
+		
+	
+	</insert>
+	
+	<delete id="MenuDelete" parameterType="hashmap">
+		{CALL PKG_MBOARD.PROC_MENU_DELETE(
+		 #{menu_id, mode=IN, jdbcType=VARCHAR }
+		)}
+	
+	</delete>
+	
+	<select id="MenuSelect" statementType="CALLABLE" parameterType="hashmap" resultType="com.pknu.menu.vo.MenuVo" >
+		{CALL PKG_MBOARD.PROC_MENU_VIEW(
+		#{menu_id,mode=IN, jdbcType=VARCHAR},
+		#{result,mode=OUT, jdbcType=CURSOR, javaType=ResultSet, resultMap= menuMap123 }
+		)}
+		
+		
+	</select>
+	
+	<update id="MenuUpdate" parameterType="hashmap">
+		{CALL PKG_MBOARD.PROC_MENU_UPDATE(
+		 #{menu_id, mode=IN, jdbcType=VARCHAR },
+		 #{menu_name, mode=IN, jdbcType=VARCHAR },
+		 #{menu_seq, mode=IN, jdbcType=NUMERIC }
+		)}
+	
+	</update>
+	
+
+	
+	  <!-- 간단히 이야기 하면 DB연결에 싱글톤을 적용하기 위한것이 DBCP (database connect pool) 
+    	DBCP를 감싼게 DataSource 그걸 감싼게 sqlSessionFactory 다시 그걸 감싼게 sqlSessionTemplate 그걸 myBatis가 이용한다.
+     -->
+	
+</mapper>

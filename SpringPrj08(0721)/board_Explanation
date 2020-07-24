@@ -1,0 +1,99 @@
+1.프로젝트 생성
+2. configure convert to maven -> group-id : com.pknu -> 하면   //  라이브러리 관련은 pom.xml
+3. 만약에 Libraries 에서 JRE System Library 가 1.8이 아니면 build path가서 해당 자바버전을 클릭해서 Edit누르기 
+4. dispatcher.servlet-xml 스프링 관련 
+--
+sqlSessionFactory가 myBatis를 읽어오는 클래스이다. 오라클에 대한 정보를 가져온다.   
+
+스프링은 <property>태그를 처리할때 name속성에 지정한 값의 첫 글자를 대문자로 변환한뒤에 일치하는 set메소드를 실행한다.
+
+구조를 보자
+
+pom.xml 은 라이브러리 관련   , 메이븐 관련 핵심파일
+web.xml 은 웹 관련 , 매 순간 페이지 이동할때 dispatcher이 작동하게 만든다. (얘가 DispatcherServler)
+dispatcher-servlet.xml 은 스프링 관련  ( HandlerMapping )
+
+view 1-> controller 2-> service 3-> DAO 4-> DB  
+							|5      |
+							------> DTO <--> boardMapper
+											
+							
+view  (	HOME, List )
+controller ( BoardController ) 
+service ( BoardService(I) , BoardServiceImplement )
+DAO  ( BoardDao(I) , BoardDaoImplement ) 
+DTO  ( BoardVo ) 
+
+전통적인 controller은 view단에 반환하기 위해서 사용한다.
+
+start
+-> @Autowired 
+	Tire tire;  
+----------------------------
+Tire tire;
+
+public void setTire(Tire tire) {
+    this.tire = tire;
+}
+----------------------------
+사실 setter 은 다 필요없네. 
+getter을 사용하는곳은 view 단에서 ${} 여기서 getter vo안에 getter 을 사용ㅎ네
+
+
+----------------------------------------07/22
+
+@Controller(Controller), @Service(Service), @Repository(DAO), @Component
+
+view-> [web.xml-> dispatcher-servlet]-> Controller -> Service -> ServiceImplement -> Dao -> DaoImplement -> borderMapper -> DB
+																					  |----- Vo
+																					  
+0. Controller에 @Controller 해주는 이유는 고전적 의미는 view단에 반환하기 위해서 이며, 사실 dispatcher-servlet에 <beans id="Controller" class="해당 경로"> 가 생성된다. 																					  
+1. 처음에 localhost하면 web.xml -> dispatcher-servlet -> Controller로 와서 return home을 받아서 다시 controller에서 -> home.jsp로 간다.
+2. list를 눌렀을때  web.xml-> dispatcher-servlet -> Controller -> RequestMapping -> /Board/List -> list함수 실행
+3. 이제 Controller 에서 DB에서 자료를 뽑아서 view단에 던져줘야 하는데  이를 위해서 service에 접근이 가능해야 한다.
+4. boardService에 접근하기 위해서 @Autowired로 private BoardService boardService를 해준다. 그러므로써 beans에 boardService가 생성되며 접근이 가능해진다.
+5. BoardVo의 대한 내용만 받는 컬렉션을 적용한다.
+6. 해당 BoardService 클래스에서 다시 Implement를 구현해서 똑같이 DAO에 접근하기 위해서 같은 동작을 반복한다. 
+7. Dao->  DaoImplement로 이동- > 마지막 @Autowired는 SqlSession sqlSession을 전달받는데 dispatcher-servlet에 있는  2가지 정보를 가져온다. DB의 각종정보와, Mapper.xml의 정보, DAO 인터페이스를 구현하기 위해서 필요한 작업
+7. 해당 과정에서 DBCP(connect pool) < DataSource < sqlSessionFactory < sqlSessionTemplate  이 모든 내용을 myBatis의 boardMapper.xml 이 이용한다.
+8. DaoImplement에서 ("Board.BoardList",idx)를 보면 Board 는 Mapper namespace이고 , BoardList는 id이름 .idx를 주는 이유는 Mapper에서  #{idx} 이렇게 사용가능 
+9. mapper 에서 SQL문을 실행한다.
+10. 다시 BoardDaoImplement 에서 return list 반환-> 거슬러서 Controller 까지 간다. model안에 "boardList"라는 이름으로 아까 조회한 list를 전달받아서 list.jsp에 뿌려준다.
+      대략 이런과정이고 추가적으로 리턴이 필요한게 있고 필요없는게 있다.
+   
+11.Write의 경우 매개변수가 BoardVo vo 인데 input의 내용들을 submit으로 받게 되면 주소창에 localhost?a=hello&b=bye 가 오는데 F12 개발자 메뉴로 보면 a : hello    b : bye 가 온다
+      그럼 각각의 내용이 BoardVo vo 안에서   setter까지 자동실행된다. 스프링이 원래 그런구조래
+
+12.Content(int idx,Model model)에서 BoardVo vo = boardService.getContent(idx); 이렇게 하는 이유는 최종적으로  boardMapper갔다가 해당 최종 결과물을 return 받아서 다시 view단에 뿌려주기 위해서 
+13.여기서 중요한게 Service단을 분리해두는 이유가 삭제번호 채우기, 조회수 증가감소 이러한 부분은 Service - 즉 비즈니스 부분은 여기에서만 처리하려고 ...그래서 getDelete함수와 getContent함수에 추가 되어 있는거!!    
+      
+/* myBatis는 PreparedStatement를 사용한것이고 #을 쓴다는 의미는 PreparedStatement ps = conn.preparedStatement(Sql)   >>ps.setInt(1,id)<< 이 부분을 의미한다. */  
+/* jsp단에서 ${} << model.Attribute("vo",vo) vo라는 변수를 통해서 vo클래스를 이용가능. vo.idx 이렇게 하면 자동으로 vo.getIdx가 실행된다  */
+/* 외부 스타일부르는 방법 <link rel ="stylesheet" href ="/css/common.css"/> 
+	해당 경로는 WebContent밑에 WEB-INF ->resources->css,img,js 생성-> css하위에 common.css 파일을 생성하고 다시 dispatcher-servlet에서  해당 경로를 추가해준다.
+	<mvc:resources location="WEB-INF/resources/css/" mapping="/css/**"/> 이런식으로 	
+*/
+/*Autowired 설명 : BoardDaoImplement에서 Autowired를 빼면 -> private SqlSession sqlSession , setter까지 만들어야 한다.
+bean을 한다는것은 Servlet에서 bean이 사용되는것이며 (자바에서는 =new라고 부른다) class의 클래스 타입으로 인스턴스해서 bean id="" 로 부르는것
+
+그럼 BoardDao의 경우는 BoardServiceImplement에서 BoardDao를 사용하고 있는데 그냥 autowired뺴고 private BoardDao boardDao 이렇게하면 사용은 가능하겠지만 현재 null이지
+근데 autowired로 사용가능한 경우는 BoardDaoImplement에서 @Repository("boardDao") 이렇게 해서 사용가능하다.
+근데 @Repository("boardDao") 이 말의 뜻은 BoardDaoImplement 전체 페이지를 boardDao의 이름으로 사용가능하게 하겠다. 
+근데 ServiceImplement에서 변수명boardDao과 DaoImplement에서 ("boardDao")가 꼭 같아야 할 필요는 없고, 클래스 타입으로 찾는다.
+
+ */
+
+Model model은 조회한 결과를 내 보내려는 클래스.  
+항상 컨트롤러는 service를 호출한다. 무조건 , 그냥 스프링에서의 약속 , 이 서비스로 갈때 데이터 조회하려고 하니깐 조회된 결과를 arraylist를 담아서 
+service와 dao 객체는 반드시 인터페이스를 만들고 만들기로 약속.
+그 다음에 boardservice.getBoardList를 호출하고 -> 인터페이스의 getBoardList로 가고 -> 다시 그걸 구현한 implements  (여기서 각종 업무를 처리한다) -> 
+다시 getBoadList를 찾아서 가면 BoardDao에 가고 -> 그걸 구현한 DaoImplement로 이동하고   -> sqlSession은 myBatis를 호출하고 selectList는() 함수를 실행해서 저 경로에서 기다리고 있다. ->
+-> boardMapper 에서 해당 sql문을 실행한다.(dispatcher-servlet에서 bean객체 mapperLocations 의 value가 *.xml 인 이유는 한 Mapper의 namespace는 한개만 지정가능하다. 다른 연결이 필요하면 Mapper.xml을 여러개 만든다)
+
+
+
+500번에러는 xml에서 
+ORA- 면 boardMapper.xml에서 쿼리 문장이 잘못된거
+ 
+
+
