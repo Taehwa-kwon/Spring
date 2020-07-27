@@ -1,0 +1,31 @@
+--
+CREATE TABLE BOARD
+(
+    IDX NUMBER(5,0) PRIMARY KEY, --글 번호
+    MENU_ID CHAR(6) NOT NULL, --MENU01 
+    TITLE VARCHAR2(100) NOT NULL, --제목
+    CONT VARCHAR2(4000) NOT NULL, --내용
+    WRITER VARCHAR2(60) NOT NULL, --작성자
+    REGDATE VARCHAR2(50), --작성일자
+    READCOUNT NUMBER(5,0), --조회수
+    BNUM NUMBER(5,0), --글 그룹번호
+    LVL NUMBER(5,0),  --새글이면 0 답글 레벨 1,2,3 리댓 리리댓
+    STEP NUMBER(5,0), --게시판 원글과 답글번호의 순서구별(글 번호는 글 적은 시간별로)
+    NREF NUMBER(5,0), --
+    DELNUM NUMBER(2,0) DEFAULT 0 --특수한 표시를 주고 임시삭제인지, 영구삭제인지 구별
+);
+
+--파일정보 보관
+CREATE TABLE FILES
+(
+    FILE_NUM NUMBER(5,0) PRIMARY KEY, --파일num
+    IDX NUMBER(5,0) NOT NULL, --게시글 번호 
+    FILENAME VARCHAR2(300) NOT NULL,  --사용자가 abc 라고 파일을 올렸을떄
+    FILEEXT VARCHAR2(20) NOT NULL, --파일 확장자명
+    SFILENAME VARCHAR2(300) NOT NULL --서버에서는 사용자들을 구별해서 
+);
+--시퀀스 생성
+CREATE SEQUENCE BRDSEQ;
+
+
+

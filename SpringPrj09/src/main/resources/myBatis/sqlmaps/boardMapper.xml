@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="Board">
+	
+	<!-- myBatis도 Statement, PreparedStatement를 따라온것 ( ? ? )    
+	myBatis는 # 이다. 
+	
+	#을 쓰면 
+	PreparedStatement ps = conn.prepareStatement(SQL문);
+	ps.setInt(1,id) 
+	-->
+	<resultMap id="BoardMap" type="com.spring.board.vo.BoardVo">
+		<result property="idx" column="IDX" javaType="int"/>
+		<result property="title" column="TITLE" javaType="String"/>
+		<result property="name" column="NAME" javaType="String"/>
+		<result property="regdate" column="REGDATE" javaType="String"/>
+	</resultMap>
+	
+	<!-- mapperspace="Board"와 select id="BoardList"는 DaoImplement에서 호출하는 이름이고 resultType="" 은 vo의 경로이고-->
+	<!-- statementType = STATEMENT, PREPARED 또는 CALLABLE 중 하나를 선택할 수 있다.  -->
+	
+	<!-- #{result}는 DaoImplement에서 사용하는 이름이고  resultMap의 이름과 위에 resultMap id는 같아야 한다. -->
+	<!-- jdbcType=CURSOR(예를들어 오라클 REFCURSOR)라면 파라미터의 타입에 ResultSet 를 매핑하기 위해 resultMap을 명시해야만 한다. -->
+	
+	<!-- parameterType의 중요성  -->
+	<select id="BoardList" statementType="CALLABLE" parameterType="hashmap" resultType="com.spring.board.vo.BoardVo">
+		{CALL PKG_GUESTS.PROC_GUESTS_LIST(
+			#{result, mode=OUT, jdbcType=CURSOR, javaType=ResultSet, resultMap = BoardMap }
+		)}
+	
+	</select>
+
+	<insert id="BoardInsert" statementType="CALLABLE" parameterType="com.spring.board.vo.BoardVo">
+		{CALL PKG_GUESTS.PROC_GUESTS_INSERT(
+			#{name, mode=IN, jdbcType=VARCHAR, javaType=string},
+			#{title, mode=IN, jdbcType=VARCHAR, javaType=string}
+			
+
+		)}
+	</insert>
+	
+	<delete id="BoardDelete" parameterType="hashmap" >
+		{CALL PKG_GUESTS.PROC_GUESTS_DELETE(
+		#{idx, mode=IN, jdbcType=VARCHAR }
+		)}
+	</delete>
+	
+	
+	
+	<select id="BoardView" statementType="CALLABLE" parameterType="hashmap" resultType="com.spring.board.vo.BoardVo">
+		{CALL PKG_GUESTS.PROC_GUESTS_VIEW(
+		#{idx , mode=IN, jdbcType=INTEGER, javaType=int},
+		#{result, mode=OUT, jdbcType=CURSOR, javaType=ResultSet, resultMap = BoardMap }
+		)}
+	
+	</select>
+	
+	
+	<update id="BoardUpdate" statementType="CALLABLE" parameterType= "hashmap">
+		{CALL PKG_GUESTS.PROC_GUESTS_UPDATE({
+		#{idx,mode=IN, jdbcType=INTEGER, javaType=int},
+		#{title,mode=IN, jdbcType=VARCHAR, javaType=string},
+		#{name,mode=IN, jdbcType=VARCHAR, javaType=string},
+		
+		})
+		
+	</update>
+
+	
+	
+</mapper>
+
+
+

@@ -1,0 +1,228 @@
+create or replace PACKAGE PKG_MBOARD AS 
+
+--------------메뉴관련 프로시저 시작---------------------
+    --전체 조회
+  PROCEDURE PROC_MENU_LIST(
+    O_CUR OUT SYS_REFCURSOR
+  );
+    --추가
+  PROCEDURE PROC_MENU_INSERT(
+    IN_MENU_NAME VARCHAR2
+  );
+  
+    --삭제
+    PROCEDURE PROC_MENU_DELETE(
+    IN_MENU_ID VARCHAR2
+    );
+    
+    --업데이트
+    PROCEDURE PROC_MENU_UPDATE(
+    IN_MENU_ID IN CHAR,
+    IN_MENU_NAME IN VARCHAR2,
+    IN_MENU_SEQ IN NUMBER
+    );
+    
+    --개별 조회
+    PROCEDURE PROC_MENU_VIEW(
+    IN_MENU_ID IN CHAR,
+    O_CUR OUT SYS_REFCURSOR
+    );
+--------------메뉴관련 프로시저 끝---------------------
+
+--------------게시물 관련 프로시저 시작----------------
+    --전체 조회
+    PROCEDURE PROC_MBOARD_LIST(
+        IN_MENU_ID IN CHAR,
+        O_CUR OUT SYS_REFCURSOR
+    );
+    --추가    
+    PROCEDURE PROC_MBOARD_INSERT(
+        IN_MENU_ID IN VARCHAR2,
+        IN_TITLE IN VARCHAR2,
+        IN_CONT IN VARCHAR2,
+        IN_WRITER IN VARCHAR2,
+        IN_BNUM IN NUMBER,
+        IN_LVL IN NUMBER,
+        IN_STEP IN NUMBER,
+        IN_NREF IN NUMBER,
+        
+        --파일 업로드
+        IN_FILENAME IN VARCHAR2,
+        IN_FILEEXT IN VARCHAR2,
+        IN_SFILENAME IN VARCHAR2
+
+    );
+
+--------------게시물 관련 프로시저 끝----------------
+    
+
+END PKG_MBOARD;
+
+
+================================================================================
+
+
+create or replace PACKAGE BODY PKG_MBOARD AS
+--------------메뉴관련 프로시저 시작---------------------
+
+
+     --기본 전체 출력 프로시저(출력을 하려면 O_CUR 가 필요하다)
+  PROCEDURE PROC_MENU_LIST(
+    O_CUR OUT SYS_REFCURSOR
+  ) 
+  AS
+  
+  BEGIN
+    OPEN O_CUR FOR
+    SELECT MENU_ID, MENU_NAME, MENU_SEQ
+    FROM MENUS
+    ORDER BY MENU_SEQ ASC
+    ;
+    
+  END 
+  PROC_MENU_LIST
+  ;
+
+        -- 추가 프로시저 
+   PROCEDURE PROC_MENU_INSERT
+  (
+    IN_MENU_NAME IN VARCHAR2
+  ) AS
+  
+    V_MENU_ID CHAR(6);
+    V_MENU_SEQ NUMBER(5, 0);
+    
+  BEGIN
+    --MENU_ID
+    SELECT 'MENU' || TRIM(TO_CHAR(TO_NUMBER(SUBSTR(NVL(MAX(MENU_ID), 'MENU00'), 5, 2)) + 1, '00')) 
+    INTO V_MENU_ID FROM MENUS;
+    
+    --MENU_SEQ
+    SELECT NVL(MAX(MENU_SEQ), 0) + 1 INTO V_MENU_SEQ FROM MENUS;
+    
+    INSERT INTO MENUS (MENU_ID, MENU_NAME, MENU_SEQ) VALUES (V_MENU_ID, IN_MENU_NAME, V_MENU_SEQ);
+    
+  END PROC_MENU_INSERT;
+  
+        -- 삭제 프로시저
+   PROCEDURE PROC_MENU_DELETE(
+    IN_MENU_ID VARCHAR2
+    )
+    AS
+    
+    BEGIN
+    
+    DELETE FROM MENUS WHERE MENU_ID = IN_MENU_ID
+    ;
+    
+    END
+    PROC_MENU_DELETE
+    ;
+         -- 업데이트 프로시저
+  PROCEDURE PROC_MENU_UPDATE(
+    IN_MENU_ID IN CHAR,
+    IN_MENU_NAME IN VARCHAR2,
+    IN_MENU_SEQ IN NUMBER
+    ) 
+    AS
+  
+  BEGIN
+    UPDATE MENUS
+    SET MENU_NAME = IN_MENU_NAME,
+        MENU_SEQ = IN_MENU_SEQ
+    WHERE MENU_ID = IN_MENU_ID ; 
+    
+  
+  END
+  PROC_MENU_UPDATE
+  ;
+  
+   -- 개인조회 프로시저
+  PROCEDURE PROC_MENU_VIEW(
+    IN_MENU_ID IN CHAR,
+    O_CUR OUT SYS_REFCURSOR
+    ) 
+    AS
+  BEGIN
+    OPEN O_CUR FOR
+    SELECT MENU_ID, MENU_NAME, MENU_SEQ
+    FROM MENUS
+    WHERE MENU_ID = IN_MENU_ID
+    ;
+    
+  END PROC_MENU_VIEW;
+
+--------------메뉴관련 프로시저 끝---------------------
+
+--------------게시물 관련 프로시저 시작----------------
+    
+    --전체 조회
+  PROCEDURE PROC_MBOARD_LIST(
+        IN_MENU_ID IN CHAR,
+        O_CUR OUT SYS_REFCURSOR
+    ) AS
+  BEGIN
+  
+    OPEN O_CUR FOR
+    
+    SELECT T1.IDX,T1.MENU_ID,T1.TITLE,T1.WRITER,T1.REGDATE,T1.READCOUNT,T1.BNUM,T1.LVL,T1.STEP,T1.NREF,T1.DELNUM,T2.FILENAME,T2.SFILENAME,T2.FILEEXT
+    FROM BOARD T1, FILES T2
+    WHERE T1.IDX=T2.IDX(+)
+    AND T1.MENU_ID = IN_MENU_ID
+    ORDER BY IDX DESC;
+    
+    
+  END PROC_MBOARD_LIST;
+
+    --추가
+  PROCEDURE PROC_MBOARD_INSERT(
+        IN_MENU_ID IN VARCHAR2,
+        IN_TITLE IN VARCHAR2,
+        IN_CONT IN VARCHAR2,
+        IN_WRITER IN VARCHAR2,
+        IN_BNUM IN NUMBER,
+        IN_LVL IN NUMBER,
+        IN_STEP IN NUMBER,
+        IN_NREF IN NUMBER,
+        
+        --파일 업로드
+        IN_FILENAME IN VARCHAR2,
+        IN_FILEEXT IN VARCHAR2,
+        IN_SFILENAME IN VARCHAR2
+
+    ) AS
+        V_BNUM NUMBER(5,0);
+        V_LVL  NUMBER(5,0);
+        V_STEP  NUMBER(5,0);
+        V_NREF  NUMBER(5,0);
+  BEGIN
+        IF IN_BNUM = 0 THEN --새글처리 0이면 새글이다.
+        --새글 번호를 확인한다.
+        SELECT NVL(MAX(BNUM),0) +1 INTO V_BNUM FROM BOARD WHERE MENU_ID = IN_MENU_ID;
+    
+        V_LVL := 0;
+        V_STEP := 1;
+        
+        SELECT NVL(MAX(NREF),0)+1 INTO V_NREF FROM BOARD WHERE MENU_ID = IN_MENU_ID;
+        
+        ELSE --답글
+        
+        NULL;
+        
+        END IF;
+        
+        
+        INSERT INTO BOARD --DB에 새로운 글 저장 ( 답글 아님 )
+        (
+            IDX,MENU_ID, TITLE,CONT, WRITER, REGDATE, READCOUNT,BNUM,LVL,STEP,NREF
+        )
+        VALUES
+        (
+        BRDSEQ.NEXTVAL, IN_MENU_ID, IN_TITLE, IN_CONT, IN_WRITER,
+        TO_CHAR(SYSDATE,'YYYY-MM-DD'),0,
+        V_BNUM, V_LVL, V_STEP, V_NREF
+        );
+  END PROC_MBOARD_INSERT;
+
+END 
+PKG_MBOARD;

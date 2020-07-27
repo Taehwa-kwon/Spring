@@ -1,0 +1,9 @@
+ - Maven은 필요한 라이브러리를 특정 문서(pom.xml)에 정의해 놓으면 내가 사용할 라이브러리 뿐만 아니라 해당 라이브러리가 작동하는데에 필요한 다른 라이브러리들까지 관리하여 네트워크를 통해서 자동으로 다운받아 준다.
+ - 컴파일,빌드,배포의 구조에 대한 설명 : java에서 RUN을 누르면 컴파일  ||  정상 실행되는것을 .war로 뽑으면 빌드 || 웹서버에 올리면 배포   
+ - pom.xml 의 packaging 웹이면 war 이다 
+ - context:component-scan base-package 때문에  @controller, @service, @Repository, @Component 사용가능 
+ - SqlSessionTemplate 는 myBatis를 사용하겠다라고 알려주는거고 2가지 설정이 필요하다. 1.db의 데이터소스 2.mapper의 폴더를 지정, DBCP<sqlSessionFactory< sqlSessionTemplate  -- Template를 보고 myBatis가 연결한다. 
+ - SqlSessionTemplate 의 클래스를 보고 @annotation에서 해당 설정정보를 찾는다.
+ 
+
+
