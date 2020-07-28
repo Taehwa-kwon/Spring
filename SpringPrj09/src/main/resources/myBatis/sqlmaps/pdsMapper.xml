@@ -55,7 +55,7 @@
 	#{nref, mode=IN, jdbcType=NUMERIC},<!-- INTEGER ,numeric -->
 	#{filename, mode=IN, jdbcType=VARCHAR},
 	#{fileext, mode=IN, jdbcType=VARCHAR},
-	#{sfilename, mode=IN, jdbcType=VARCHAR},
+	#{sfilename, mode=IN, jdbcType=VARCHAR}
 	)}	
 	</insert>
 

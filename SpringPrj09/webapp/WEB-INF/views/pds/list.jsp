@@ -14,8 +14,9 @@
 <body>
 	<h1>${pdsVo.menu_id }자료실 목록보기</h1>
 	
-	<!-- 방법1 --><%@include file="/WEB-INF/include/menus.jsp" %>
-	<!-- 방법2  <jsp:include page=""></jsp:include>  -->
+	<!-- 방법1 -->
+	<%@include file="/WEB-INF/include/menus.jsp" %>
+	<!-- 방법2 <jsp:include page=""></jsp:include>  -->
 	
 	<table>
 		<tr style="background-color:rgba(255, 255, 128, .5)">
@@ -33,7 +34,9 @@
 			<td>${pdsVo.title }</td>
 			<td>${pdsVo.writer }</td>
 			<td>${pdsVo.readcount }</td>
-			<td>${pdsVo.filename }</td>
+			<td><a href="<c:out value='/download/external/${pdsVo.filename }'/>">${pdsVo.filename }</a></td>
+			<!-- 이 c:out 문법 보기- 심플한코딩백과사전에서 c:out태그를 사용하는 이유 보기  -->
+			<!-- 여기서 대박인게 value의 /download/external/${pdsVo.filename} 인데 이게 Controller에서 RequestMapping으로 간다. -->
 			<td>${pdsVo.regdate }</td>
 		</tr>	
 		</c:forEach>
@@ -41,8 +44,12 @@
 			<td colspan="6">
 				<a href="/PDS/WriteForm?bnum=0&menu_id=${pdsVo.menu_id }&nref=0&step=0&lvl=0">새글쓰기</a> 
 				<!-- 여기서 bnum = 0을주고 그러면 프로시저에서 IF IN_BNUM=0이다  이게 완성이 된다.-->
+				<a href="javascript:history.go(-1)">back</a>
+				<a href="javascript:history.reload()">reload</a>
+				<a href="javascript:history.go(1)">go</a>
 			</td>
 		</tr>
 	</table>
+
 </body>
 </html>

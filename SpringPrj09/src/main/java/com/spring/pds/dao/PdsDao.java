@@ -9,4 +9,6 @@ public interface PdsDao {
 
 	List<PdsVo> getPdsList(HashMap<String, Object> map);
 
+	void setWrite(HashMap<String, Object> map);
+
 }

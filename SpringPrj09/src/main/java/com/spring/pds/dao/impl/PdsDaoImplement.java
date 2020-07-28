@@ -25,4 +25,10 @@ public class PdsDaoImplement implements PdsDao {
 		return pdsList;
 	}
 
+	@Override
+	public void setWrite(HashMap<String, Object> map) {
+		sqlSession.insert("PDS.PdsWrite",map);
+	}
+	
+	
 }

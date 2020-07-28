@@ -19,7 +19,11 @@ top 메뉴 , bottom메뉴 jsp를 따로 만든다.
 	<table border="1">
 		<tr style="background-color:rgba(255, 255, 128, .5)">
 			<c:forEach var="menuVo" items="${menuList }">
-			<td><a href="/PDS/List?menu_id=${menuVo.menu_id }">${menuVo.menu_name}</a></td>
+				<td>
+					<a href="/PDS/List?menu_id=${menuVo.menu_id }">${menuVo.menu_name}</a>
+				</td>
 			</c:forEach>
 		</tr>
 	</table>
+	
+	
