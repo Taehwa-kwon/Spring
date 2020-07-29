@@ -11,4 +11,6 @@ public interface PdsDao {
 
 	void setWrite(HashMap<String, Object> map);
 
+	List<PdsVo> getView(HashMap<String, Object> map);
+
 }

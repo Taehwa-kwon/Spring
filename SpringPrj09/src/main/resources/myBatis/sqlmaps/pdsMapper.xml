@@ -11,7 +11,7 @@
 	PreparedStatement ps = conn.prepareStatement(SQL문);
 	ps.setInt(1,id) 
 	-->
-	<resultMap id="PdsMap" type="com.spring.pds.vo.PdsVo">
+	<resultMap id="PdsListMap" type="com.spring.pds.vo.PdsVo">
 		 <result property="idx"          column="IDX"       javaType="int" />
          <result property="menu_id"       column="MENU_ID"    javaType="string" />
          <result property="title"       column="TITLE"       javaType="string" />
@@ -36,13 +36,41 @@
 	<!-- jdbcType=CURSOR(예를들어 오라클 REFCURSOR)라면 파라미터의 타입에 ResultSet 를 매핑하기 위해 resultMap을 명시해야만 한다. -->
 	
 	<!-- parameterType의 중요성  -->
+	<!-- 전체조회 -->
+	
+	<resultMap id="PdsViewMap" type="com.spring.pds.vo.PdsVo">
+		 <result property="idx"          column="IDX"       javaType="int" />
+         <result property="menu_id"       column="MENU_ID"    javaType="string" />
+         <result property="title"       column="TITLE"       javaType="string" />
+         <result property="cont"       column="CONT"       javaType="string" />
+         <result property="writer"       column="WRITER"    javaType="string" />
+         <result property="regdate"       column="REGDATE"    javaType="string" />
+         <result property="readcount"    column="READCOUNT"    javaType="int" />
+         <result property="bnum"       column="BNUM"       javaType="int" />
+         <result property="lvl"          column="LVL"       javaType="int" />
+         <result property="step"       column="STEP"       javaType="int" />
+         <result property="nref"       column="NREF"       javaType="int" />
+         <result property="filename"      column="FILENAME"    javaType="string" />
+         <result property="fileext"      column="FILEEXT"    javaType="string" />
+         <result property="sfilename"   column="SFILENAME"    javaType="string" />
+	</resultMap>
+	
 	<select id="PdsList" statementType="CALLABLE" parameterType="hashmap" resultType="com.spring.pds.vo.PdsVo">
 		{CALL PKG_MBOARD.PROC_MBOARD_LIST(
 			#{menu_id, mode=IN, jdbcType=VARCHAR },
-			#{result, mode=OUT, jdbcType=CURSOR, javaType=ResultSet, resultMap = PdsMap }
+			#{result, mode=OUT, jdbcType=CURSOR, javaType=ResultSet, resultMap = PdsListMap }
+		)}
+	</select>
+
+	<!-- 개인조회 -->
+	<select id="PdsView" statementType="CALLABLE" parameterType="hashmap" resultType="com.spring.pds.vo.PdsVo">
+		{CALL PKG_MBOARD.PROC_MBOARD_VIEW(
+			#{idx, mode=IN, jdbcType=NUMERIC },
+			#{result, mode=OUT, jdbcType=CURSOR, javaType=ResultSet, resultMap = PdsViewMap}
 		)}
 	</select>
 	
+	<!-- 추가 -->
 	<insert id="PdsWrite" parameterType="hashmap">
 	{CALL PKG_MBOARD.PROC_MBOARD_INSERT(
 	#{menu_id, mode=IN, jdbcType=VARCHAR},
@@ -58,8 +86,6 @@
 	#{sfilename, mode=IN, jdbcType=VARCHAR}
 	)}	
 	</insert>
-
-	
 
 	
 	

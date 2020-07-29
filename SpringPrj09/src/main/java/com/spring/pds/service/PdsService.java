@@ -13,4 +13,6 @@ public interface PdsService {
 
 	void setWrite(HashMap<String, Object> map, HttpServletRequest request);
 
+	List<PdsVo> getView(HashMap<String, Object> map);
+
 }

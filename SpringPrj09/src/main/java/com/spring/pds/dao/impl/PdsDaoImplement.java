@@ -29,6 +29,13 @@ public class PdsDaoImplement implements PdsDao {
 	public void setWrite(HashMap<String, Object> map) {
 		sqlSession.insert("PDS.PdsWrite",map);
 	}
+
+	@Override
+	public List<PdsVo> getView(HashMap<String, Object> map) {
+		sqlSession.selectList("PDS.PdsView", map);
+		List<PdsVo> pdsList = (List<PdsVo>) map.get("result");
+		return pdsList;
+	}
 	
 	
 }

@@ -11,7 +11,7 @@
 
 </head>
 <body>
-	<h1>Board 목록(list)</h1>
+	<h1>Board 목록 / 전체 게시판 (list)</h1>
 
 	<table>
 		<tr style="background-color: rgba(255, 255, 128, .5)">

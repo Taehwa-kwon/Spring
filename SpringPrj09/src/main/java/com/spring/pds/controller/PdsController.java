@@ -3,6 +3,8 @@ package com.spring.pds.controller;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
@@ -35,12 +37,12 @@ public class PdsController {
 	
 	@RequestMapping("/PDS/List")
 	public ModelAndView pdsList(PdsVo vo) {
-		//border+Files 조회 : menu_id 에 해당되는것을 조회한다.
+		//BOARD+FILES 테이블 조회 : menu_id 에 해당되는것을 조회한다.
 		HashMap <String,Object> map = new HashMap<String,Object>();
 		map.put("menu_id", vo.getMenu_id());
 		List <PdsVo> pdsList = pdsService.getPdsList(map);
 		
-		//Menus테이블 조회
+		//Menus테이블 조회 (사진,스포츠,유머)
 		List<MenuVo>menuList = menuService.getList(map);
 		
 		//List.jsp 위한 준비
@@ -91,11 +93,8 @@ public class PdsController {
 			map.put("step", vo.getStep());
 			map.put("nref", vo.getNref());
 			
-			System.out.println("mapmap"+map);
-			
 			//글 저장
 			pdsService.setWrite(map,request);
-			
 			
 			//저장 이후 처리
 			List<MenuVo>menuList = menuService.getList(map);
@@ -112,18 +111,21 @@ public class PdsController {
 		//{sfile}		: .jpg와 같이 .포함 글자는 무시. 다운안받는다.
 		//{sfile:.+} 	: 정규식! 확장자에 .문자가 한개 이상일때  , 즉 점이 있는것만,(확장자) 다운받겠습니다~ 즉 점이 무조건 하나이상이여야 함. 그런 애들만RequestMapping이 가능하다. 
 		//method = get방식만 가능하게 제한하는것.
+		
+							// /download/external/${pdsVo.filename }
 		@RequestMapping(value="/download/{type}/{sfile:.+}",method=RequestMethod.GET)
 		public void downloadFile(HttpServletResponse response,
 					@PathVariable("type")String type,//{} 템플릿변수
 					@PathVariable("sfile")String sfile
 				) {
-			String INTERNAL_FILE = sfile; //내부 파일
-			String EXTERNAL_FILE_PATH = "h:\\Upload\\"+ sfile; //외부 파일에서 
-			//ClassLoader은 이 전체 현재 클래스   currentThread 현재 실행중인 쓰레드를그 클래스 정보를 가져온나.
+			String INTERNAL_FILE = sfile; //내부 파일 명 
+			String EXTERNAL_FILE_PATH = "h:\\Upload\\"+ sfile; //외부 파일경로 + 파일명
 			File file = null;
 			if(type.equalsIgnoreCase("internal")) {
 				ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-				file = new File(classLoader.getResource(INTERNAL_FILE).getFile()); //이 위치정보를 가져와서 , getFile 그 파일을 가져온나.
+				//ClassLoader은 이 전체 현재 클래스   currentThread 현재 실행중인 쓰레드 그 클래스 정보를 가져온나.
+				file = new File(classLoader.getResource(INTERNAL_FILE).getFile()); 
+				//이 위치정보를 가져와서 , getFile 그 파일을 가져온나.
 				//현재 실행중인 폴더에 있는것을 사용하는것이 internal. 
 			} else {
 				file = new File(EXTERNAL_FILE_PATH);
@@ -132,13 +134,29 @@ public class PdsController {
 			//다운로드할 파일이 없습니다.
 			if(!file.exists()) {
 				String errorMessage = "다운로드할 파일이 없습니다.";
-				//이럴때는 HTML로 내 보내야한다. 이 error은 db에 저장되어 있는데 하드디스크에 저장되어 있지 않는 경우
+				//이럴때는 HTML로 내 보내야한다. 이 error은 db에 저장되어 있는데 하드디스크에 저장되어 있지 않는 경우, 해당 오류가 발생
 				
 				//out.print(); //response.getWrite를 해야한다. 그래야 out이 가능하다.
-				OutputStream outputStream = response.getOutputStream();
-				outputStream.write(errorMessage.getBytes(Charset.forName("UTF-8")));
-				//이 함수는 byte단위로 파일을 처리해야 한다. 웹은 모든 데이터를 byte단위로 처리한다.
-				outputStream.close();
+				OutputStream outputStream = null;
+				try {
+					outputStream = response.getOutputStream();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				try {
+					outputStream.write(errorMessage.getBytes(Charset.forName("UTF-8")));
+					//이 함수는 byte단위로 파일을 처리해야 한다. 웹은 모든 데이터를 byte단위로 처리한다.
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				try {
+					outputStream.close();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 				return;
 				
 			}
@@ -161,10 +179,38 @@ public class PdsController {
 			response.setHeader("Content-Dispostition", String.format("inline; filename=\""+file.getName()+"\""));
 			//filename은 ""안에 넣어야하는데 \" 이렇게 해야 들어감.
 			response.setContentLength((int)file.length());
-			InputStream inputStream = new BufferedInputStream(new FileInputStream(file));
-			FileCopyUtils.copy(inputStream, response.getOutputStream());
+			InputStream inputStream = null;
+			try {
+				inputStream = new BufferedInputStream(new FileInputStream(file));
+			} catch (FileNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			try {
+				FileCopyUtils.copy(inputStream, response.getOutputStream());
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			//이 내용이 핵심문장이다.  copy는 byte단위로 해서 다 copy하고 close both streams < 이렇게 하면 inputStream.close() outputStream.close() 둘다 생략이 가능하다.
 		
+		}
+		
+		@RequestMapping("/PDS/View") // PDS/View?idx=8&bnum=1&lvl=0$step=1$nref=1$menu_id=MENU01
+		public ModelAndView view(PdsVo vo) {
+			
+			HashMap<String,Object>map = new HashMap<String,Object>();
+			map.put("idx",vo.getIdx());
+			
+			
+			List<PdsVo> ViewList =  pdsService.getView(map); 
+			List<MenuVo>menuList = menuService.getList(map);
+			ModelAndView mv = new ModelAndView();
+			mv.addObject("menuList", menuList);
+			mv.addObject("pdsVo",ViewList.get(0) );
+			
+			mv.setViewName("pds/content");
+			return mv;
 		}
 		
 		

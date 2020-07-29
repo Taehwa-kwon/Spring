@@ -35,7 +35,8 @@ public class MenuDaoImplement implements MenuDao{
 	public void setWriteMenu(HashMap<String, Object> map) {
 		
 		System.out.println("setWrite : "+map.toString());
-		sqlSession.insert("Menu.MenuInsert",map); //값을 Mapper에 전달하는 역할을 한다.즉 MenuController에서 map.put("menu_name", vo.getMenu_name()); //key, value 
+		sqlSession.insert("Menu.MenuInsert",map); 
+		//값을 Mapper에 전달하는 역할을 한다.즉 MenuController에서 map.put("menu_name", vo.getMenu_name()); //key, value 
 		
 	}
 

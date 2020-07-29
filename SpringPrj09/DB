@@ -11,7 +11,7 @@ CREATE TABLE BOARD
     BNUM NUMBER(5,0), --글 그룹번호
     LVL NUMBER(5,0),  --새글이면 0 답글 레벨 1,2,3 리댓 리리댓
     STEP NUMBER(5,0), --게시판 원글과 답글번호의 순서구별(글 번호는 글 적은 시간별로)
-    NREF NUMBER(5,0), --
+    NREF NUMBER(5,0), --고객들의 선호도 
     DELNUM NUMBER(2,0) DEFAULT 0 --특수한 표시를 주고 임시삭제인지, 영구삭제인지 구별
 );
 

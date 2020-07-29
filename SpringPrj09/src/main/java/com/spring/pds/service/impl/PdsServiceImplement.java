@@ -44,7 +44,7 @@ public class PdsServiceImplement implements PdsService {
 		MultipartHttpServletRequest multipartHttpServletRequest = (MultipartHttpServletRequest) request; 
 		//파일에 관련된 객체에 짚어넣는다. 이 변수를 통해서 파일을 조작할수 있다.
 		Iterator<String> iterator = multipartHttpServletRequest.getFileNames();
-		//for문의 i 가 iterator의 i 이다 . iterator은 반복자라는 의미 
+		//for문의 i 가 iterator의 i 이다 . iterator은 반복자라는 의미 , 어떤 손가락을 의미한다.
 		//여러개 파일이 넘어오면 그것을 처리 위해서 iterator을 사용한다. 넘어온 파일들의 이름들 getFileNames();
 		//write.jsp에서 여러개의 파일들을 넘겨줘도 iterator을 통해서 다 처리가 가능하다.
 		
@@ -78,7 +78,7 @@ public class PdsServiceImplement implements PdsService {
 				//multipartFile.transferTo(file); try catch
 				try {
 					multipartFile.transferTo(file);
-					//파일저장
+					//이 부분에서 파일을 저장한다.
 				} catch (IllegalStateException | IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -87,13 +87,19 @@ public class PdsServiceImplement implements PdsService {
 			}//if
 			
 		}//while
-		map.put("filename", fileName);
-		map.put("fileext", fileExt);
-		map.put("sfilename", sFileName);
+		map.put("filename", fileName); //파일이름
+		map.put("fileext", fileExt); //확장자이름
+		map.put("sfilename", sFileName); //전체 이름
 
 		
 		pdsDao.setWrite(map);
 		
 	}//setWrite
+
+	@Override
+	public List<PdsVo> getView(HashMap<String, Object> map) {
+		List<PdsVo> pdsList=pdsDao.getView(map);
+		return pdsList;
+	}
 
 }

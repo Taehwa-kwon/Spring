@@ -12,7 +12,7 @@
 
 </head>
 <body>
-	<h1>${pdsVo.menu_id }자료실 목록보기</h1>
+	<h1>${pdsVo.menu_id } 카테고리 게시판/자료실 목록보기</h1>
 	
 	<!-- 방법1 -->
 	<%@include file="/WEB-INF/include/menus.jsp" %>
@@ -31,11 +31,10 @@
 		<c:forEach var="pdsVo" items="${pdsList}">
 		<tr>
 			<td>${pdsVo.idx }</td>
-			<td>${pdsVo.title }</td>
+			<td><a href="/PDS/View?idx=${pdsVo.idx }&bnum=${pdsVo.bnum}&lvl=${pdsVo.lvl}&step=${pdsVo.step}&nref=${pdsVo.nref}&menu_id=${pdsVo.menu_id}">${pdsVo.title }</a></td>
 			<td>${pdsVo.writer }</td>
 			<td>${pdsVo.readcount }</td>
 			<td><a href="<c:out value='/download/external/${pdsVo.filename }'/>">${pdsVo.filename }</a></td>
-			<!-- 이 c:out 문법 보기- 심플한코딩백과사전에서 c:out태그를 사용하는 이유 보기  -->
 			<!-- 여기서 대박인게 value의 /download/external/${pdsVo.filename} 인데 이게 Controller에서 RequestMapping으로 간다. -->
 			<td>${pdsVo.regdate }</td>
 		</tr>	
