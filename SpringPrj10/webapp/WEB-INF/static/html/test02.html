@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+
+</head>
+<script>
+	$(function(){
+		$('#btn1').on('click',function(e){
+			$.ajax({
+				data: {
+					id  : $('#id').val(),
+					pass  : $('#pass').val(),
+					email : $('#email').val() 
+				},
+				
+				type:'get',
+				contentType: 'application/json',
+				url:'/test1',
+
+				dataType:'json',
+				
+				success:function(datas){
+					alert(datas);
+					console.log(datas); //여기서는 JSON Object인데 
+					
+					var B = JSON.stringify(datas); //이렇게 하면JSON객체를 String객체로 로 바꿀수 있다. 
+					
+					alert(JSON.stringify(datas));  
+					
+					var C = JSON.parse(B); 
+					
+					console.log(JSON.stringify(datas)); 
+					
+					console.log(JSON.parse(B));  //다시 배열형태.
+					
+					
+					var A = '<div>'+C.id+'</div>';
+					 	A += '<div>'+datas.pass+'</div>';
+					
+						$('#div1').html(A);
+					
+
+					var C= '<ul>';
+					C+= '<li> id : '+datas.id+'</li>';
+					C+= '<li> pass : '+datas.pass+'</li>';
+					C+= '<li> email : '+datas.email+'</li>';
+					
+					$('#div2').html(C);
+					
+					
+
+					
+					
+				},
+				error : function(error){
+					alert('오류발생'+error.statusText);
+				}
+			})
+		})
+	});
+
+</script>
+<body>
+	<h1>HTML </h1>
+	<input type="text" id="id" placeholder="id"/>
+	<input type="text" id="pass" placeholder="pass"/>
+	<input type="text" id="email" placeholder="email형식"/>
+	
+	<input type="button" value="button" id="btn1">
+	
+	<div id="div1"></div>
+	<div id="div2"></div>
+</body>
+</html>

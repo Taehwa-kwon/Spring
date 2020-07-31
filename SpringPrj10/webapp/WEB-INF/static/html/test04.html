@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+
+</head>
+<script>
+	$(function(){
+		$('#btn1').on('click',function(e){
+			$.ajax({
+								
+				type:'get',
+				dataType:'json',
+				url:'http://61.43.246.153/openapi-data/service/busanBIMS2/busStop?bstopnm=부산시청&serviceKey=z0NnHCU0cm6CZm9x5QQMEb%2BQUDXyvlkooFcYswFbgHiJK7bQY3uDccLyBLgtLQKhvFMvf7XkT2JvZXlsuWFXUg%3D%3D&numOfRows=3&pageNo=1',
+				//부산버스정보시스템을 사용하려고 했는데 ! 동일 주소 원칙위반으로 조회안됌 ,, 그러니깐 localhost이거 때문인듯
+				contentType: "application/json",
+						
+				success:function(datas){
+					console.log(datas); 
+					alert(datas);
+					
+					var html = '<div>';
+					$.each(datas,function(index,item){
+						html += '<div>';
+						html += '<p> 번호 : ' + item.num + '</p>';
+						html += '<p> 이름 : ' + item.id + '</p>';
+						html += '<p> 이메일 : ' + item.email + '</p>';
+						
+						html += '</div>';
+					})
+					html += '</div>';
+					$('#div1').html(html);
+				},
+				error : function(error){
+					alert('오류발생'+error.statusText);
+				}
+			})
+		})
+	});
+
+</script>
+<body>
+	<h1>HTML </h1>
+	
+	<input type="button" value="button" id="btn1">
+	
+	<div id="div1"></div>
+	<div id="div2"></div>
+</body>
+</html>

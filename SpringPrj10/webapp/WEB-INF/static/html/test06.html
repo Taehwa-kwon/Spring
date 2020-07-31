@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+<style>
+	#div1 {width :400px; border: 1px solid black; float:left; margin:5px;}
+</style>
+</head>
+<script>
+	$(function(){
+		$('#btn1').on('click',function(e){
+			$.ajax({
+								
+				dataType:'json',
+				
+				url:'/getMovieJson',
+				
+						
+				success:function(datas){
+					console.log(datas); 
+					alert(datas);
+					var List = datas.boxOfficeResult.dailyBoxOfficeList;
+					var html ='';
+					$.each(List,function(index,item){
+						console.log(item);
+						html +='  <p> '+ item.rank +'위  : '+ item.movieNm+' </p>';
+					})
+					alert(html); //object였네...
+					
+					$('#div1').html(JSON.stringify(html)); //이 말뜻은 json을 형태를 String 으로 바꾼다. 
+//					$('#div1').html(JSON.stringify(datas));
+					
+				},
+				error : function(error){
+					alert('오류발생'+error.statusText);
+				}
+			})
+		})
+	});
+	
+	$(function(){
+		$('#btn2').on('click',function(e){
+			$.ajax({
+								
+				dataType:'xml',
+				url:'/getMovieXml',
+						
+				success:function(datas){
+					console.log(datas);
+					
+					var html = '';
+					//$(datas).find('dailyBoxOfficeList').each(function(index){
+					$(datas).find('dailyBoxOffice').each(function(index){
+						//jQuery XML  파싱하는 방법 : find().text().attr() 
+						
+					
+						console.log($(this));
+						html += '<p>영화 순위 : ' + $(this).find('movieNm').text() + '</p>';
+					});
+					$('#div2').html(html);
+					 
+				},
+				error : function(error){
+					alert('오류발생'+error.statusText);
+				}
+			})
+		})
+	});
+
+
+</script>
+<body>
+	<h1> 영화진흥위원회 API사용 </h1>
+	
+	<input type="button" value="json" id="btn1">
+	<input type="button" value="xml" id="btn2">
+	
+	<div id="div1"></div>
+	<div id="div2"></div>
+</body>
+</html>

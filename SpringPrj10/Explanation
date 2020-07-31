@@ -1,0 +1,21 @@
+1. View단에서 type,data,dataType,contentType까지 합쳐서 url : /ajax 로 Controller에 보내고 ,
+2. requestMapping에서 v는 View단에서 {v: 'test01.html의 Data} 가 넘어온다.
+
+/*방법 1*/  /ajax매핑에서  HttpServletResponse 이렇게 하면 ajax로 넘어간다 . test01로 
+/*방법 2*/  /test매핑해서 보내면 return으로 test02로 넘어간다.
+
+3. String json을 만들어서  이건->home에 있는걸 바로 출력할려고   response.getWriter().print(json); 이렇게 view단으로 보낸다( view단은 그냥 html로  내용을 표현하는거 )
+
+
+
+
+
+/* 
+JSON.stringify( A ) A라는 Object를 배열로 바꾼다
+JSON.parse ( B ) B라는 배열을 Object로 바꾼다. 
+ */
+ 
+ 
+ 
+ 
+ 1. ㄱ

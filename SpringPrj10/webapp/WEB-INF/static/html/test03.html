@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+
+</head>
+<script>
+	$(function(){
+		$('#btn1').on('click',function(e){
+			$.ajax({
+				type:'get',
+				dataType:'json',
+				
+				url:'/test2',
+				contentType: 'application/json',
+				
+				success:function(datas){
+					console.log(datas); 
+					alert(datas);
+					
+					var html = '<div>';
+					$.each(datas,function(index,item){
+						html += '<div>';
+						html += '<p> 번호 : ' + item.num + '</p>';
+						html += '<p> 이름 : ' + item.id + '</p>';
+						html += '<p> 이메일 : ' + item.email + '</p>';
+						
+						html += '</div>';
+					})
+					html += '</div>';
+					$('#div1').html(html);
+				},
+				error : function(error){
+					alert('오류발생'+error.statusText);
+				}
+			})
+		})
+	});
+
+</script>
+<body>
+	<h1>HTML </h1>
+	<input type="button" value="button" id="btn1">
+	
+	<div id="div1"></div>
+	<div id="div2"></div>
+</body>
+</html>

@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+
+</head>
+<script>
+	$(function(){
+		$('#btn1').on('click',function(e){
+			
+			$.ajax({ //HttpRequest객체와 똑같음 
+				data:{v:'test01.html 의 Data'}, //데이터를 서버에 보낸다.
+				type:'GET', //서버에 보내는 방식 
+				contentType: 'application/json', //서버로 전송시킬 content-type 데이터
+				url:'/ajax', //서버에 보내는 URL
+				
+				
+				dataType:'json', //서버에서 요청 받아올 데이터 형식
+
+				
+				success:function(datas){
+					console.log(datas);
+					
+					var A = '<div>'+datas.id+'</div>';
+					 A += '<div>'+datas.pass+'</div>';
+					 A += '<div>'+datas.v+'</div>';
+					
+					$('#div1').html(A);
+				},
+				error : function(error){
+					alert('오류발생'+error.statusText);
+				}
+			})
+		})
+	});
+
+</script>
+<body>
+	<h1>HTML </h1>
+	<input type="button" value="button" id="btn1">
+	
+	<div id="div1"></div>
+</body>
+</html>
