@@ -1,0 +1,290 @@
+create or replace PACKAGE PKG_PDS AS 
+    --추가+파일 업로드
+  PROCEDURE PROC_PDS_INSERT (
+  IN_MENU_ID IN VARCHAR2,
+  IN_TITLE IN VARCHAR2,
+  IN_CONT IN VARCHAR2,
+  IN_WRITER  IN VARCHAR2,
+  IN_BNUM IN NUMBER,
+  IN_LVL IN NUMBER,
+  IN_STEP IN NUMBER,
+  IN_NREF IN NUMBER,
+ 
+   
+  IN_FILENAMES IN FILE_ARRAY,
+  IN_FILEEXTS IN FILE_ARRAY,
+  IN_SFILENAMES IN FILE_ARRAY
+
+  );
+     --PAGING 처리
+  PROCEDURE PROC_PDS_LIST
+  (
+    IN_MENU_ID IN VARCHAR2, 
+   
+    IN_NOWPAGE IN NUMBER,  -- 현재 페이지 정보
+    IN_PAGECOUNT IN NUMBER, --한 페이지에 보여줄 LINE수 
+    
+    OUT_RECORDCOUNT OUT NUMBER, --전체 자료수 
+
+    O_CUR OUT SYS_REFCURSOR
+  
+  );
+    --게시판 내용 조회
+  PROCEDURE PROC_PDS_CONTENT(
+    IN_IDX IN NUMBER,
+    O_CUR OUT SYS_REFCURSOR
+  );
+  
+  --첨부파일 목록(FILES 테이블에 있는 내용을 반환한다)
+  PROCEDURE PROC_PDS_FILELIST
+  (
+    IN_IDX IN NUMBER,
+    O_CUR OUT SYS_REFCURSOR
+  );
+  
+  --글 수정하기
+  PROCEDURE PROC_PDS_UPDATE
+  (
+    IN_IDX IN NUMBER,
+    IN_TITLE IN VARCHAR2,
+    IN_CONT IN VARCHAR2
+  );
+  
+  --글 삭제하기
+  PROCEDURE PROC_PDS_DELETE
+  (
+   IN_IDX IN NUMBER,
+  IN_NREF IN NUMBER,
+  IN_LVL IN NUMBER,
+  IN_STEP IN NUMBER
+  );
+  
+
+END PKG_PDS;
+
+================================================================================
+
+
+create or replace PACKAGE BODY PKG_PDS AS
+
+  PROCEDURE PROC_PDS_INSERT (
+  IN_MENU_ID IN VARCHAR2,
+  IN_TITLE IN VARCHAR2,
+  IN_CONT IN VARCHAR2,
+  IN_WRITER  IN VARCHAR2,
+  IN_BNUM IN NUMBER,
+  IN_LVL IN NUMBER,
+  IN_STEP IN NUMBER,
+  IN_NREF IN NUMBER,
+
+  IN_FILENAMES IN FILE_ARRAY,
+  IN_FILEEXTS IN FILE_ARRAY,
+  IN_SFILENAMES IN FILE_ARRAY
+  
+  ) AS
+    V_BNUM NUMBER(5,0);
+    V_LVL NUMBER(5,0);
+    V_STEP NUMBER(5,0);
+    V_NREF NUMBER(5,0);
+    
+    V_MAXIDX NUMBER(5,0);
+  
+  BEGIN
+    IF IN_BNUM =0 THEN --새글처리
+    SELECT NVL(MAX(BNUM),0)+1 INTO V_BNUM FROM BOARD WHERE MENU_ID = IN_MENU_ID;
+    V_LVL := 0;
+    V_STEP := 0;
+    SELECT NVL(MAX(NREF),0)+1 INTO V_NREF FROM BOARD WHERE MENU_ID = IN_MENU_ID;
+    
+    
+    ELSE --답글 처리 (즉 IN_BNUM이 0이 아닌것들)
+      V_BNUM := IN_BNUM;
+      V_LVL := IN_LVL +1;
+      V_STEP := IN_STEP +1;
+      V_NREF := IN_NREF;
+      
+      --기존 답글에 대한 순서 +1  
+      UPDATE BOARD
+        SET STEP = STEP+1
+        WHERE MENU_ID = IN_MENU_ID
+        AND NREF = IN_NREF
+        AND STEP > IN_STEP  --내 댓글보다 큰것 
+    ;
+    END IF;
+    
+    --게시글 처리
+    INSERT INTO BOARD 
+    ( IDX,MENU_ID, TITLE , CONT, WRITER, REGDATE, READCOUNT, BNUM, LVL, STEP, NREF )
+    VALUES 
+    ( BRDSEQ.NEXTVAL, IN_MENU_ID, IN_TITLE, IN_CONT, IN_WRITER, TO_CHAR(SYSDATE ,'YYYY-MM-DD'),0, V_BNUM, V_LVL, V_STEP, V_NREF )
+    ;
+    
+    --가장 마지막에 추가된 글의 IDX를 V_MAXIDX에 넣어둔다.
+    SELECT MAX(IDX) INTO V_MAXIDX FROM BOARD; 
+    
+    --FILES 처리
+       IF IN_FILENAMES(1) IS NOT NULL THEN 
+        FOR I IN IN_FILENAMES.FIRST .. IN_FILENAMES.LAST
+        LOOP
+             INSERT INTO FILES
+                (FILE_NUM, IDX, FILENAME, FILEEXT, SFILENAME ) 
+            VALUES
+            (
+                (SELECT NVL(MAX(FILE_NUM), 0) + 1 FROM FILES), V_MAXIDX, IN_FILENAMES(I), IN_FILEEXTS(I), IN_SFILENAMES(I)
+            );
+        END LOOP;
+        ELSE 
+            NULL;
+    
+    END IF;
+    
+    --FILES 처리
+  END PROC_PDS_INSERT;
+  
+  
+ --페이징 처리 
+  PROCEDURE PROC_PDS_LIST
+  (
+    IN_MENU_ID IN VARCHAR2, 
+   
+    IN_NOWPAGE IN NUMBER,  --현재 페이지 정보
+    IN_PAGECOUNT IN NUMBER, --한 페이지에 보여줄 LINE수 --10 
+    
+    OUT_RECORDCOUNT OUT NUMBER, --전체 자료수를 계산해서 출력
+    
+    O_CUR OUT SYS_REFCURSOR
+  
+  ) AS
+   
+    PAGE_STARTNUM NUMBER(5,0); --시작페이지 선언
+    PAGE_ENDNUM NUMBER(5,0); --종료페이지 선언
+    
+  BEGIN
+   
+   --전체 자료수 계산
+    SELECT COUNT(IDX) INTO OUT_RECORDCOUNT
+    FROM BOARD
+    WHERE MENU_ID = IN_MENU_ID;
+    
+    --IN_NOWPAGE , IN_PAGECOUNT=10 ,  
+    PAGE_STARTNUM := (IN_NOWPAGE-1) * IN_PAGECOUNT + 1; --초기값 설정 
+    PAGE_ENDNUM := IN_NOWPAGE * IN_PAGECOUNT;
+    
+     IF OUT_RECORDCOUNT <= PAGE_ENDNUM THEN --현재페이지합이 종료페이지보다 작을때 
+        PAGE_ENDNUM := OUT_RECORDCOUNT;
+    END IF;
+    
+    OPEN O_CUR FOR
+        SELECT  *
+        FROM (
+            SELECT ROW_NUMBER() OVER (ORDER BY B1.NREF DESC, B1.STEP ASC) AS RN,
+                    B1.IDX, B1.MENU_ID,
+                    LPAD(' ', 2*B1.LVL) || DECODE (LVL, 0, ' ','[Re]') ||  TITLE as title, --lvl = 0이면 새글  lvl > 0 답글 
+                    B1.WRITER,B1.REGDATE,B1.READCOUNT,
+                        ( 
+                            SELECT NVL(COUNT(FILENAME),0)
+                            FROM FILES
+                            WHERE IDX = B1.IDX
+                        ) FILECOUNT,
+                    B1.BNUM,B1.LVL,B1.STEP,B1.NREF,B1.DELNUM
+            FROM BOARD B1 --한 페이지에 보여줄 글번호, 메뉴번호,글제목,작성자, 뭐 등등 
+            WHERE  MENU_ID = IN_MENU_ID
+        ) T1
+        WHERE T1.RN BETWEEN PAGE_STARTNUM AND PAGE_ENDNUM
+        ORDER BY NREF DESC, STEP ASC; 
+  END PROC_PDS_LIST;  
+
+
+
+    --게시판 내용 조회
+  PROCEDURE PROC_PDS_CONTENT(
+    IN_IDX IN NUMBER,
+    O_CUR OUT SYS_REFCURSOR
+  ) AS
+  BEGIN
+  
+    -- 조회수 증가
+         UPDATE BOARD
+         SET READCOUNT = READCOUNT + 1
+         WHERE IDX = IN_IDX
+         
+         ;
+         
+         
+    OPEN O_CUR FOR
+        SELECT IDX,MENU_ID, TITLE, CONT, WRITER, REGDATE ,READCOUNT , BNUM, LVL , STEP, NREF
+        FROM BOARD
+        WHERE IDX= IN_IDX;
+    
+  END PROC_PDS_CONTENT;
+  
+  
+   --첨부파일 목록(FILES 테이블에 있는 내용을 반환한다)
+  PROCEDURE PROC_PDS_FILELIST
+  (
+    IN_IDX IN NUMBER,
+    O_CUR OUT SYS_REFCURSOR
+  ) AS
+  BEGIN
+    OPEN O_CUR FOR 
+        SELECT FILE_NUM, IDX,FILENAME, FILEEXT, SFILENAME
+        FROM FILES
+        WHERE IDX = IN_IDX
+        ;
+    
+  END PROC_PDS_FILELIST;
+
+
+
+  --글 수정하기
+  PROCEDURE PROC_PDS_UPDATE
+  (
+    IN_IDX IN NUMBER,
+    IN_TITLE IN VARCHAR2,
+    IN_CONT IN VARCHAR2
+  ) AS
+  BEGIN
+    UPDATE BOARD
+    SET TITLE = IN_TITLE,
+        CONT = IN_CONT
+    WHERE IDX = IN_IDX;
+    
+  END PROC_PDS_UPDATE;
+
+    --글 삭제하기(둘중에 하나라도 오류뜨면 ROLLBACK에서 SAVEPOINT를 기준으로 돌아간다. 
+  PROCEDURE PROC_PDS_DELETE
+  (
+  IN_IDX IN NUMBER,
+  IN_NREF IN NUMBER,
+  IN_LVL IN NUMBER,
+  IN_STEP IN NUMBER
+  
+  ) AS
+  BEGIN
+        SAVEPOINT SP_DELETE_PTR;
+            UPDATE BOARD SET DELNUM = 1
+            WHERE IDX= IN_IDX;
+             --0.삭제할 IDX 에 DELNUM을 1을 세팅해주고 그 다음에 
+            
+            --답글이 있는지 없는지 찾아줌. 
+            DELETE FROM BOARD 
+            WHERE NOT EXISTS (
+            SELECT 1 FROM BOARD
+            WHERE NREF = IN_NREF --2. 같은 글 그룹을 찾고 
+            AND LVL = IN_LVL + 1  --3. 나보다 LVL+1 이 인것이 있고
+            AND STEP = IN_STEP+1  --4. 나보다 STEP +1 이 있는것이 있으면 
+            )
+            AND IDX = IN_IDX --1. 글 번호가 같은걸 지우는데 
+            ;
+           --최종적으로 : 답글이 없으면 지운다.
+        
+        COMMIT;
+        EXCEPTION
+            WHEN OTHERS THEN
+            ROLLBACK TO SP_DELETE_PTR;
+            RAISE;  --경고의 메세지를 찍는다.. 뭐 검색해보면 됌 
+        
+    
+  END PROC_PDS_DELETE;
+
+END PKG_PDS;

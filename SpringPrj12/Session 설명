@@ -1,0 +1,7 @@
+1. 처음에 시작하자마자 Interceptor로 빠지고 / 경로를 찾는데  preHanler에서 걸리고 switch에서 못찾고 ->request.getRequestURI() 이게 공백이니깐    
+2. if(obj==null)로 빠지고 sendRedirect("/login")으로 간다.																*1
+3. Controller에서 login메소드안에서 loginForm으로 가는데 다시 Interceptor이쪽으로 와서 switch에서 해당하는게 걸리니깐 -> loginForm으로 간다. 	*1
+4. 로그인을 채워서 보내면 loginProcess -> Interceptor 로 온다. request.getRequestURI() 이게 있고 session이 만들어진다.  return true / UserController 에서 /loginProcess로 간다. *1
+5. 첫번째 session에 로그인기록들을 초기화 해주고 !! UserVo vo = userSErvice.login(map) 이 실행되고 두번쨰 if문이 있으니깐 실행된다.  
+6. 
+

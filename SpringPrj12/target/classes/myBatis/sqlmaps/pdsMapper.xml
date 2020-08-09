@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+    
+  <mapper namespace="PDS">   
+    <!-- 자료실 목록 리스트 resultMap property="idx" 라면 vo에도 setter이 있어야 한다. -->
+    <resultMap id="PDSListMap" type="com.spring.pds.vo.PdsVo">
+      <result property="idx"       column="IDX"       javaType="int" />
+      <result property="menu_id"   column="MENU_ID"   javaType="string" />
+      <result property="title"     column="TITLE"     javaType="string" />
+      <result property="cont"      column="CONT"      javaType="string" />
+      <result property="writer"    column="WRITER"    javaType="string" />
+      <result property="regdate"   column="REGDATE"   javaType="string" />
+      <result property="readcount" column="READCOUNT" javaType="int" />      
+      <result property="bnum"      column="BNUM"      javaType="int" />
+      <result property="lvl"       column="LVL"       javaType="int" />
+      <result property="step"      column="STEP"      javaType="int" />
+      <result property="nref"      column="NREF"      javaType="int" />    
+      <result property="delnum"    column="DELNUM"    javaType="int" /> 
+    </resultMap>  
+    
+   <!-- parameterType="hashmap" 프로시저는 무조건 hashmap이고 jdbcType = java가 인식하는 문법 
+   		
+   		resultType은 내부 참조명
+   		resultMap 은 외부 참조명
+    -->
+   
+   <select id="PdsList" statementType="CALLABLE"
+        parameterType="hashmap"   
+        resultType="com.spring.pds.vo.PdsVo" > 
+     {CALL  PKG_PDS.PROC_PDS_LIST(   
+        #{menu_id,     mode=IN,  jdbcType=VARCHAR },        
+        #{nowpage,     mode=IN,  jdbcType=INTEGER },
+        #{pagecount,   mode=IN,  jdbcType=INTEGER },
+        #{recordcount,  mode=OUT, jdbcType=INTEGER },        
+        #{result,  mode=OUT, 
+        jdbcType=CURSOR, javaType=ResultSet, resultMap=PDSListMap }
+      )}          
+    </select>
+      <!-- recordcount 같은 경우는 한개만 출력받기때문에 resultMap으로 못받는다. 그래서 이렇게 하나만 입력함. 
+      	recordcount는 out으로 해놓으면 자동으로 map으로 바로 담긴다. DaoImplement에서 Systemoutprint찍어보면 출력이됌
+      	cursor은 테이블같은 형태로 출력하기 떄문에 recordcount를 같이 넣어줄수없다.
+      -->
+  
+    <resultMap id="FileListMap" type="com.spring.pds.vo.FilesVo">     
+      <result property="file_num"   column="FILE_NUM"  javaType="int" />
+      <result property="idx"        column="IDX"       javaType="int" />
+      <result property="filename"   column="FILENAME"  javaType="string" />
+      <result property="fileext"    column="FILEEXT"   javaType="string" />
+      <result property="sfilename"  column="SFILENAME" javaType="string" />
+    </resultMap>  
+      
+    <select id="FileList" statementType="CALLABLE" parameterType="hashmap" 
+        resultType="com.spring.pds.vo.FilesVo">
+     {CALL  PKG_PDS.PROC_PDS_FILELIST(   
+        #{idx,     mode=IN,  jdbcType=INTEGER },
+        #{result,  mode=OUT, jdbcType=CURSOR, javaType=ResultSet,
+             resultMap=FileListMap }
+      )}          
+    </select>   
+   
+    <insert id="PdsInsert" statementType="CALLABLE" 
+        parameterType="hashmap" >
+    {CALL PKG_PDS.PROC_PDS_INSERT(
+    	#{menu_id,    mode=IN,  jdbcType=VARCHAR},
+    	#{title,      mode=IN,  jdbcType=VARCHAR},
+    	#{cont,       mode=IN,  jdbcType=VARCHAR},
+    	#{writer,     mode=IN,  jdbcType=VARCHAR},
+    	#{bnum,       mode=IN,  jdbcType=INTEGER},
+    	#{lvl,        mode=IN,  jdbcType=INTEGER},
+    	#{step,       mode=IN,  jdbcType=INTEGER},
+    	#{nref,       mode=IN,  jdbcType=INTEGER},    	    	
+    	#{filename,  mode=IN,
+    	  jdbcTypeName=FILE_ARRAY,
+    	  typeHandler=com.spring.pds.service.typehandler.ListMapTypeHandler
+    	},
+    	#{fileext,  mode=IN, 
+    	  jdbcTypeName=FILE_ARRAY,
+    	  typeHandler=com.spring.pds.service.typehandler.ListMapTypeHandler
+    	},    	
+    	#{sfilename,  mode=IN,
+    	  jdbcTypeName=FILE_ARRAY,
+    	  typeHandler=com.spring.pds.service.typehandler.ListMapTypeHandler
+    	}
+    )}   
+    </insert>
+    <!-- filenames, fileexts, sfilenames 이 세가지를 오라클의 배열타입과  myBatis와 연결하기 위해서 typeHandler이 필요하다.
+     오라클에서 유형을 File_Array만들어야 한다.     -->
+    
+    
+    <!-- resultType="com.spring.pds.vo.PdsVo" -->
+    <select id="PdsContent" statementType="CALLABLE"
+    	parameterType="hashmap"
+    	resultType="com.spring.pds.vo.PdsVo" >
+    	
+    {CALL PKG_PDS.PROC_PDS_CONTENT(
+    	#{idx, mode=IN , jdbcType=INTEGER},
+    	#{result, mode=OUT, jdbcType=CURSOR , javaType=ResultSet, resultMap=PDSListMap }
+    )}
+    	
+    </select>
+   
+   <!-- jdbcType이 NUMERIC 이면 javaType이 DOUBLE이다. -->
+   <insert id="PdsUpdate" statementType="CALLABLE" 
+        parameterType="hashmap" >
+    {CALL PKG_PDS.PROC_PDS_UPDATE(
+    	#{idx, 		  mode=IN,  jdbcType=INTEGER},
+    	#{title,      mode=IN,  jdbcType=VARCHAR},
+    	#{cont,       mode=IN,  jdbcType=VARCHAR}
+    	
+    )}   
+    </insert>
+    
+    
+    <delete id="PdsDelete" statementType="CALLABLE" parameterType="hashmap">
+   	{CALL PKG_PDS.PROC_PDS_DELETE(
+   		#{idx, mode=IN, jdbcType=INTEGER},
+   		#{lvl, mode=IN, jdbcType=INTEGER},
+   		#{step, mode=IN, jdbcType=INTEGER},
+   		#{nref, mode=IN, jdbcType=INTEGER}
+   	
+   	)}
+   	
+    
+    </delete>
+   
+  </mapper>  
+    
