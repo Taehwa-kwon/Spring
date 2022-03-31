@@ -20,7 +20,7 @@
 	<dependency>
 		<groupId>org.springframework</groupId>
 		<artifactId>spring-webmvc</artifactId>
-		<version>4.2.4.RELEASE</version>
+		<version>5.3.18</version>
 	</dependency>
 		<!-- DB연결 OJDBC6 라이브러리    (maven 중앙 저장소에서 ojdbc6을 제공하지 않는다.그래서 리포지토리를 설정해줘야 한다.)-->
 	<dependency>
